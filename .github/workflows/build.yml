@@ -7,6 +7,9 @@ name: Build Hondana APK
 # The APK is built here rather than in a dev container because Google's Maven
 # repository and the Android SDK (dl.google.com) are often blocked there.
 # GitHub's Ubuntu runners ship the Android SDK preinstalled.
+#
+# The first push of a repo's history doesn't fire `push` workflows; any later
+# push to main (or a manual run from the Actions tab) does.
 
 on:
   push:
