@@ -81,10 +81,13 @@ To build locally you need JDK 21 and the Android SDK (platform 36):
 merges have a real merge base:
 
 ```bash
-git remote add upstream https://github.com/komikku-app/komikku   # once
-git fetch upstream
-git merge upstream/master      # resolve, push; CI builds the new APK
+scripts/sync-komikku.sh            # or: scripts/sync-komikku.sh v1.15.0
+git push                           # CI builds and publishes the new APK
 ```
+
+The script adds the `upstream` remote if needed, merges, and removes
+Komikku's CI workflows again (they need Komikku's secrets). If there are
+conflicts, it lists them for you to resolve.
 
 Hondana code sits in `hondana` packages or between `// HONDANA -->` and
 `// HONDANA <--` markers in upstream files. That keeps conflicts small and easy

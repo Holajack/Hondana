@@ -78,9 +78,8 @@ Install the APK from the release, then:
 ## Syncing with Komikku
 
 ```bash
-git fetch upstream                  # upstream = https://github.com/komikku-app/komikku
-git merge upstream/master
+scripts/sync-komikku.sh             # merges upstream/master (or a tag), drops Komikku's workflows
 ```
 
-Resolve conflicts around the `HONDANA` markers. Upstream workflow files that
-come back in a merge are deleted again: they need Komikku's secrets.
+Resolve conflicts around the `HONDANA` markers, then push. CI builds the APK.
+Upstream workflow files must stay deleted: they need Komikku's secrets.

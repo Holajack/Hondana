@@ -21,7 +21,6 @@ import com.anthropic.models.messages.StopReason
 import com.anthropic.models.messages.TextBlockParam
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
-import java.time.Duration
 import java.util.Base64
 
 /**
@@ -52,10 +51,10 @@ class ClaudeService(private val settings: () -> Settings) {
     private fun client(apiKey: String): AnthropicClient {
         cachedClient?.takeIf { cachedKey == apiKey }?.let { return it }
         cachedClient?.close()
+        // The SDK sizes its own timeout from max_tokens and retries 408/429/5xx/529 with backoff.
         return AnthropicOkHttpClient.builder()
             .apiKey(apiKey)
             .maxRetries(2)
-            .timeout(Duration.ofSeconds(120))
             .build()
             .also {
                 cachedKey = apiKey
