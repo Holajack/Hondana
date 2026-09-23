@@ -315,3 +315,25 @@
 -dontwarn org.ietf.jgss.Oid
 -dontwarn com.google.re2j.Matcher
 -dontwarn com.google.re2j.Pattern
+
+# HONDANA -->
+-keep,allowoptimization class hondana.**
+
+-keep,includedescriptorclasses class hondana.**$$serializer { *; }
+-keepclassmembers class hondana.** {
+    *** Companion;
+}
+-keepclasseswithmembers class hondana.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+
+# Anthropic Java SDK: some of its dependencies (Apache HttpClient 5, standardwebhooks,
+# Error Prone annotations) reference JDK-only classes that Android doesn't ship. The
+# code paths that use them (Kerberos auth, java.net.http webhooks, Brotli bodies)
+# are never reached from the Messages and Models calls Hondana makes.
+-dontwarn java.net.http.**
+-dontwarn org.ietf.jgss.**
+-dontwarn org.brotli.dec.**
+-dontwarn javax.lang.model.**
+-dontwarn com.google.errorprone.annotations.**
+# HONDANA <--

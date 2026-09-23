@@ -113,6 +113,9 @@ import eu.kanade.tachiyomi.util.view.setComposeContent
 import exh.source.isEhBasedSource
 import exh.util.defaultReaderType
 import exh.util.mangaType
+import hondana.reader.HondanaReader
+import hondana.reader.ui.HondanaReaderOverlay
+import hondana.reader.ui.ReaderTools
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableSet
@@ -198,6 +201,10 @@ class ReaderActivity : BaseActivity() {
 
     private var loadingIndicator: ReaderProgressIndicator? = null
 
+    // HONDANA -->
+    private lateinit var hondana: HondanaReader
+    // HONDANA <--
+
     var isScrollingThroughPages = false
         private set
 
@@ -224,6 +231,10 @@ class ReaderActivity : BaseActivity() {
         windowInsetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
         super.onCreate(savedInstanceState)
+
+        // HONDANA -->
+        hondana = HondanaReader(this)
+        // HONDANA <--
 
         binding = ReaderActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -256,8 +267,13 @@ class ReaderActivity : BaseActivity() {
         setMenuVisibility(viewModel.state.value.menuVisible)
 
         // EXH -->
-        enableExhAutoScroll()
+        // HONDANA: Hondana's auto-scroll engine (hondana.reader.AutoScrollController) replaces this loop
+        // enableExhAutoScroll()
         // EXH <--
+
+        // HONDANA -->
+        hondana.attach()
+        // HONDANA <--
 
         // Finish when incognito mode is disabled
         preferences.incognitoMode().changes()
@@ -350,6 +366,10 @@ class ReaderActivity : BaseActivity() {
                 ContentOverlay(state = state)
 
                 AppBars(state = state)
+
+                // HONDANA -->
+                HondanaReaderOverlay(hondana, state)
+                // HONDANA <--
             }
 
             // KMK -->
@@ -522,6 +542,9 @@ class ReaderActivity : BaseActivity() {
      */
     override fun onDestroy() {
         super.onDestroy()
+        // HONDANA -->
+        if (::hondana.isInitialized) hondana.destroy()
+        // HONDANA <--
         viewModel.state.value.viewer?.destroy()
         config = null
         menuToggleToast?.cancel()
@@ -757,6 +780,9 @@ class ReaderActivity : BaseActivity() {
             },
             onClickShiftPage = ::shiftDoublePages,
             // SY <--
+            // HONDANA -->
+            hondanaTools = { backgroundColor -> ReaderTools(hondana, state, backgroundColor) },
+            // HONDANA <--
         )
     }
 

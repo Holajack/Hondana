@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Reader tools -->
+    <string name="hondana_tool_auto_scroll">Auto-scroll</string>
+    <string name="hondana_tool_lens">Lens</string>
+    <string name="hondana_tool_read_aloud">Read aloud</string>
+    <string name="hondana_tool_voices">Voices</string>
+    <string name="hondana_tool_words">Words</string>
+
+    <!-- Auto-scroll -->
+    <string name="hondana_autoscroll_speed">Speed %1$d</string>
+    <string name="hondana_autoscroll_seconds">%1$ds / page</string>
+    <string name="hondana_autoscroll_pause">Pause auto-scroll</string>
+    <string name="hondana_autoscroll_resume">Resume auto-scroll</string>
+    <string name="hondana_autoscroll_slower">Slower</string>
+    <string name="hondana_autoscroll_faster">Faster</string>
+    <string name="hondana_autoscroll_stop">Stop auto-scroll</string>
+
+    <!-- Lens -->
+    <string name="hondana_lens_title">Lens</string>
+    <string name="hondana_lens_reading">Reading the page…</string>
+    <string name="hondana_lens_found">%1$d pieces of text</string>
+    <string name="hondana_lens_nothing_found">No text found on this screen.</string>
+    <string name="hondana_lens_engine_claude">Claude</string>
+    <string name="hondana_lens_engine_device">On-device</string>
+    <string name="hondana_lens_show_translations">Show translations</string>
+    <string name="hondana_lens_hide_translations">Show original</string>
+    <string name="hondana_lens_read_all">Read all</string>
+    <string name="hondana_lens_stop">Stop</string>
+    <string name="hondana_lens_rescan_claude">Read again with Claude</string>
+    <string name="hondana_lens_rescan_device">Read again on-device</string>
+    <string name="hondana_lens_close">Close lens</string>
+    <string name="hondana_lens_hint">Tap any text to translate, hear or explain it.</string>
+
+    <!-- Block actions -->
+    <string name="hondana_action_speak">Listen</string>
+    <string name="hondana_action_speak_translation">Listen (translation)</string>
+    <string name="hondana_action_translate">Translate</string>
+    <string name="hondana_action_explain">Explain</string>
+    <string name="hondana_action_look_up">Look up</string>
+    <string name="hondana_action_copy">Copy</string>
+    <string name="hondana_action_save">Save</string>
+    <string name="hondana_action_anki">Anki</string>
+    <string name="hondana_action_save_word">Save word</string>
+    <string name="hondana_explain_loading">Asking Claude…</string>
+    <string name="hondana_explain_literal">Literally</string>
+    <string name="hondana_explain_words">Words</string>
+    <string name="hondana_explain_grammar">Grammar</string>
+    <string name="hondana_explain_notes">Notes</string>
+    <string name="hondana_kind_speech">Speech</string>
+    <string name="hondana_kind_thought">Thought</string>
+    <string name="hondana_kind_narration">Narration</string>
+    <string name="hondana_kind_sfx">Sound effect</string>
+    <string name="hondana_kind_sign">Sign</string>
+    <string name="hondana_kind_other">Text</string>
+
+    <!-- Read aloud -->
+    <string name="hondana_read_aloud_finding">Finding the text…</string>
+    <string name="hondana_read_aloud_narrator">Narrator</string>
+    <string name="hondana_read_aloud_pause">Pause</string>
+    <string name="hondana_read_aloud_resume">Resume</string>
+    <string name="hondana_read_aloud_skip">Skip line</string>
+    <string name="hondana_read_aloud_stop">Stop reading</string>
+    <string name="hondana_read_aloud_paused">Paused</string>
+
+    <!-- Voices -->
+    <string name="hondana_voices_title">Character voices</string>
+    <string name="hondana_voices_empty">No characters yet. Read a few pages aloud with Claude and the people who speak will show up here, each with their own voice.</string>
+    <string name="hondana_voices_no_manga">Open a series to edit its voices.</string>
+    <string name="hondana_voices_voice">Voice</string>
+    <string name="hondana_voices_default_voice">Default voice</string>
+    <string name="hondana_voices_pitch">Pitch</string>
+    <string name="hondana_voices_pace">Pace</string>
+    <string name="hondana_voices_test">Test</string>
+    <string name="hondana_voices_remove">Remove</string>
+
+    <!-- Words -->
+    <string name="hondana_words_title">Saved words</string>
+    <string name="hondana_words_empty">Nothing saved yet. In the lens, tap some text and choose Save, or save single words from an explanation.</string>
+    <string name="hondana_words_share_tsv">Share as TSV (Anki import)</string>
+    <string name="hondana_words_status_new">New</string>
+    <string name="hondana_words_status_learning">Learning</string>
+    <string name="hondana_words_status_known">Known</string>
+    <string name="hondana_words_delete">Delete</string>
+    <string name="hondana_action_done">Done</string>
+
+    <!-- Settings -->
+    <string name="hondana_pref_category_hondana">Reading assistant</string>
+    <string name="hondana_pref_hondana_summary">Auto-scroll, lens, read aloud, Claude</string>
+    <string name="hondana_pref_group_languages">Languages</string>
+    <string name="hondana_pref_learning_language">Language I\'m reading</string>
+    <string name="hondana_pref_native_language">My language</string>
+    <string name="hondana_pref_group_claude">Claude</string>
+    <string name="hondana_pref_claude_api_key">API key</string>
+    <string name="hondana_pref_claude_api_key_unset">Not set. Claude reads speakers and gives better translations and explanations.</string>
+    <string name="hondana_pref_claude_api_key_set">Set (%1$s)</string>
+    <string name="hondana_pref_claude_model">Model</string>
+    <string name="hondana_pref_claude_effort">Effort</string>
+    <string name="hondana_pref_claude_effort_low">Low (fastest)</string>
+    <string name="hondana_pref_claude_effort_medium">Medium</string>
+    <string name="hondana_pref_claude_effort_high">High (most careful)</string>
+    <string name="hondana_pref_claude_check">Check connection</string>
+    <string name="hondana_pref_claude_check_summary">Confirms the key works with the chosen model</string>
+    <string name="hondana_pref_claude_info">Create a key at console.anthropic.com → API keys. The key stays on this phone and is left out of backups. Reading a page with %1$s costs about $%2$s; each page is read once and cached.</string>
+    <string name="hondana_pref_group_text">Text and translation</string>
+    <string name="hondana_pref_text_engine">Read text with</string>
+    <string name="hondana_pref_translation_engine">Translate with</string>
+    <string name="hondana_engine_auto">Claude when a key is set, else on-device</string>
+    <string name="hondana_engine_on_device">On-device (offline)</string>
+    <string name="hondana_engine_claude">Claude</string>
+    <string name="hondana_pref_clear_cache">Clear saved page readings</string>
+    <string name="hondana_pref_clear_cache_done">Cleared</string>
+    <string name="hondana_pref_group_read_aloud">Read aloud</string>
+    <string name="hondana_pref_read_aloud_text">Read</string>
+    <string name="hondana_read_aloud_text_original">The original text (listening practice)</string>
+    <string name="hondana_read_aloud_text_translation">The translation (audio drama)</string>
+    <string name="hondana_pref_speech_rate">Speech rate</string>
+    <string name="hondana_pref_character_voices">A voice for each character</string>
+    <string name="hondana_pref_character_voices_summary">Uses the speakers Claude identifies</string>
+    <string name="hondana_pref_read_aloud_auto_advance">Turn pages automatically</string>
+    <string name="hondana_pref_read_sound_effects">Read sound effects</string>
+    <string name="hondana_pref_tts_settings">Text-to-speech engine and voices</string>
+    <string name="hondana_pref_tts_settings_summary">Install more voices in Android\'s text-to-speech settings</string>
+    <string name="hondana_pref_group_auto_scroll">Auto-scroll</string>
+    <string name="hondana_pref_autoscroll_speed">Long-strip speed</string>
+    <string name="hondana_pref_autoscroll_resume">Keep scrolling after touching the page</string>
+    <string name="hondana_pref_autoscroll_info">Paged modes turn the page every few seconds; set the time with the − and + buttons while auto-scroll runs.</string>
+    <string name="hondana_pref_group_words">Words</string>
+    <string name="hondana_pref_open_words">Saved words</string>
+</resources>

@@ -20,6 +20,7 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material.icons.outlined.Sync
+import androidx.compose.material.icons.outlined.Translate
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBarDefaults
@@ -48,6 +49,8 @@ import eu.kanade.presentation.util.Screen
 import exh.assets.EhAssets
 import exh.assets.ehassets.EhLogo
 import exh.assets.ehassets.MangadexLogo
+import hondana.i18n.HMR
+import hondana.settings.SettingsHondanaScreen
 import kotlinx.collections.immutable.persistentListOf
 import tachiyomi.i18n.MR
 import tachiyomi.i18n.kmk.KMR
@@ -201,6 +204,14 @@ object SettingsMainScreen : Screen() {
             icon = Icons.AutoMirrored.Outlined.ChromeReaderMode,
             screen = SettingsReaderScreen,
         ),
+        // HONDANA -->
+        Item(
+            titleRes = HMR.strings.hondana_pref_category_hondana,
+            subtitleRes = HMR.strings.hondana_pref_hondana_summary,
+            icon = Icons.Outlined.Translate,
+            screen = SettingsHondanaScreen,
+        ),
+        // HONDANA <--
         Item(
             titleRes = MR.strings.pref_category_downloads,
             subtitleRes = MR.strings.pref_downloads_summary,

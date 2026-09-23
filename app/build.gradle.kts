@@ -224,6 +224,9 @@ dependencies {
     // SY -->
     implementation(projects.i18nSy)
     // SY <--
+    // HONDANA -->
+    implementation(projects.i18nHondana)
+    // HONDANA <--
     implementation(projects.core.archive)
     implementation(projects.core.common)
     implementation(projects.coreMetadata)
@@ -368,6 +371,19 @@ dependencies {
 
     // ZXing Android Embedded
     implementation(sylibs.zxing.android.embedded)
+    // SY <--
+
+    // HONDANA -->
+    // On-device text recognition. Bundled models: offline, no download on first use.
+    implementation("com.google.mlkit:text-recognition:16.0.1")
+    implementation("com.google.mlkit:text-recognition-japanese:16.0.1")
+    implementation("com.google.mlkit:text-recognition-chinese:16.0.1")
+    implementation("com.google.mlkit:text-recognition-korean:16.0.1")
+    // On-device translation; fetches one ~30 MB model per language pair on first use.
+    implementation("com.google.mlkit:translate:17.0.3")
+    // Claude, through the official Anthropic Java SDK.
+    implementation("com.anthropic:anthropic-java:2.39.0")
+    // HONDANA <--
 }
 
 androidComponents {

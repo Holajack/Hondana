@@ -25,6 +25,7 @@ import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import eu.kanade.presentation.reader.components.ChapterNavigator
@@ -99,6 +100,9 @@ fun ReaderAppBars(
     onClickPageLayout: () -> Unit,
     onClickShiftPage: () -> Unit,
     // SY <--
+    // HONDANA -->
+    hondanaTools: @Composable (backgroundColor: Color) -> Unit = {},
+    // HONDANA <--
 ) {
     val isRtl = viewer is R2LPagerViewer
     val backgroundColor = MaterialTheme.colorScheme
@@ -250,6 +254,9 @@ fun ReaderAppBars(
                         // SY <--
                     )
                 }
+                // HONDANA -->
+                hondanaTools(backgroundColor)
+                // HONDANA <--
                 ReaderBottomBar(
                     modifier = Modifier
                         .fillMaxWidth()

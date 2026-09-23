@@ -12,10 +12,13 @@ Komikku's own feature list is in [docs/KOMIKKU_README.md](docs/KOMIKKU_README.md
 
 ## Install
 
-**[Download hondana.apk](https://github.com/Holajack/hondana/releases/download/hondana-latest/hondana.apk)**
+**[Download hondana-arm64-v8a.apk](https://github.com/Holajack/Hondana/releases/download/hondana-latest/hondana-arm64-v8a.apk)**
+(almost every phone from 2017 on). If it won't install, use the universal
+[hondana.apk](https://github.com/Holajack/Hondana/releases/download/hondana-latest/hondana.apk),
+which is larger.
 
-That link always serves the newest build, because every push to `main`
-replaces it. The repo is private, so sign in to GitHub in your phone's browser
+These links always serve the newest build, because every push to `main`
+replaces them. The repo is private, so sign in to GitHub in your phone's browser
 first. Then open the link and tap the downloaded file. The first time, Android
 asks you to allow installs from that browser.
 
@@ -39,8 +42,25 @@ and `mihon://extension-store` links also open in Hondana.
 
 ## Features
 
-Everything from Komikku. Hondana's own additions are listed in
-[docs/FEATURES.md](docs/FEATURES.md) as they land.
+Everything from Komikku, plus a row of reading tools in the reader menu:
+
+- **Auto-scroll** for every reading mode: smooth, adjustable scrolling for
+  long strips, and timed page turns for paged manga. Pauses when you touch the
+  page or open the menu.
+- **Lens**: freeze the screen and tap any bubble to translate it, hear it, get
+  a word-by-word explanation with grammar notes, look it up in your dictionary
+  app, save it, or send it to AnkiDroid. Flip the whole page between original
+  and translation.
+- **Read aloud**: hands-free reading, bubble by bubble, with a separate voice
+  for each character, then on to the next page. Read the original for listening
+  practice, or the translation as an audio drama.
+- **Saved words** with New / Learning / Known status, AnkiDroid and TSV export.
+
+Text recognition and translation work offline on the phone (Google ML Kit:
+Latin, Japanese, Chinese and Korean scripts). Add a Claude API key under
+**Settings → Reading assistant** for speakers, better translations and
+explanations, and for other scripts. Details, costs and privacy notes are in
+[docs/FEATURES.md](docs/FEATURES.md).
 
 ## Building
 

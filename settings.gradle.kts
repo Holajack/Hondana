@@ -50,6 +50,9 @@ include(":domain")
 include(":i18n")
 // KMK -->
 include(":i18n-kmk")
+// HONDANA -->
+include(":i18n-hondana")
+// HONDANA <--
 include(":flagkit")
 // KMK <--
 // SY -->
