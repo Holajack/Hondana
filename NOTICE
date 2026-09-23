@@ -1,0 +1,15 @@
+Hondana
+Copyright 2026 Jacken Holland (Holajack)
+
+This product is a modified version of Komikku
+(https://github.com/komikku-app/komikku), which is derived from Mihon
+(https://github.com/mihonapp/mihon), TachiyomiSY and Tachiyomi.
+
+  Copyright 2015 Javier Tomás
+  Copyright 2024 Mihon Open Source Project
+  Copyright Komikku contributors
+
+Licensed under the Apache License, Version 2.0 (see LICENSE). Files changed
+for Hondana are marked with "HONDANA" comments or live under the
+`hondana` packages. "Mihon", "Komikku" and "Tachiyomi" are the names of
+their respective projects; this fork is not affiliated with or endorsed by them.

@@ -2,6 +2,7 @@ import mihon.buildlogic.Config
 import mihon.buildlogic.getBuildTime
 import mihon.buildlogic.getCommitCount
 import mihon.buildlogic.getGitSha
+import java.util.Properties
 
 plugins {
     id("mihon.android.application")
@@ -22,11 +23,19 @@ if (Config.includeTelemetry) {
 
 shortcutHelper.setFilePath("./shortcuts.xml")
 
+// HONDANA -->
+// Release signing. CI secrets (HONDANA_KEYSTORE*) win when set; otherwise the
+// keystore committed under signing/ is used, so every build carries the same
+// signature and installs as an update over the previous one.
+val hondanaSigningProperties = rootProject.file("signing/signing.properties")
+// HONDANA <--
+
 android {
     namespace = "eu.kanade.tachiyomi"
 
     defaultConfig {
-        applicationId = "app.komikku"
+        // HONDANA: own package so it installs next to Mihon/Komikku
+        applicationId = "com.holajack.hondana"
 
         versionCode = 81
         versionName = "1.14.1"
@@ -39,6 +48,26 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    // HONDANA -->
+    signingConfigs {
+        create("hondana") {
+            val keystoreFromEnv = System.getenv("HONDANA_KEYSTORE")
+            if (!keystoreFromEnv.isNullOrBlank()) {
+                storeFile = file(keystoreFromEnv)
+                storePassword = System.getenv("HONDANA_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("HONDANA_KEY_ALIAS")
+                keyPassword = System.getenv("HONDANA_KEY_PASSWORD")
+            } else if (hondanaSigningProperties.exists()) {
+                val props = Properties().apply { hondanaSigningProperties.inputStream().use { load(it) } }
+                storeFile = rootProject.file("signing/${props.getProperty("storeFile")}")
+                storePassword = props.getProperty("storePassword")
+                keyAlias = props.getProperty("keyAlias")
+                keyPassword = props.getProperty("keyPassword")
+            }
+        }
+    }
+    // HONDANA <--
 
     buildTypes {
         val debug by getting {
@@ -53,6 +82,10 @@ android {
             proguardFiles("proguard-android-optimize.txt", "proguard-rules.pro")
 
             buildConfigField("String", "BUILD_TIME", "\"${getBuildTime(useLastCommitTime = true)}\"")
+
+            // HONDANA -->
+            signingConfig = signingConfigs.getByName("hondana")
+            // HONDANA <--
         }
 
         val commonMatchingFallbacks = listOf(release.name)
@@ -338,6 +371,17 @@ dependencies {
 }
 
 androidComponents {
+    // HONDANA -->
+    // versionCode follows the commit count so every CI build is a strict
+    // upgrade of the last one; upstream's own versionCode line stays untouched
+    // to keep upstream merges conflict-free.
+    val hondanaVersionCode = getCommitCount().toInt()
+    onVariants { variant ->
+        variant.outputs.forEach { output ->
+            output.versionCode.set(hondanaVersionCode)
+        }
+    }
+    // HONDANA <--
     onVariants(selector().withFlavor("default" to "standard")) {
         // Only excluding in standard flavor because this breaks
         // Layout Inspector's Compose tree

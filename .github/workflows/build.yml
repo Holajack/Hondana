@@ -1,0 +1,144 @@
+name: Build Hondana APK
+
+# Builds the signed release APK and publishes it to a rolling GitHub release,
+# so the phone always downloads the newest build from one stable link:
+#   https://github.com/<owner>/<repo>/releases/download/hondana-latest/hondana.apk
+#
+# The APK is built here rather than in a dev container because Google's Maven
+# repository and the Android SDK (dl.google.com) are often blocked there.
+# GitHub's Ubuntu runners ship the Android SDK preinstalled.
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    permissions:
+      # Needed to publish the APK as a release asset.
+      contents: write
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          # versionCode is the commit count, which needs full history.
+          fetch-depth: 0
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version-file: .github/.java-version
+          distribution: temurin
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # Standard runners for private repos have 2 cores and ~7 GB of RAM. One
+      # JVM (Kotlin compiling in-process) avoids two 4 GB heaps fighting.
+      - name: Tune Gradle for the runner
+        run: |
+          mkdir -p ~/.gradle
+          cat >> ~/.gradle/gradle.properties <<'EOF'
+          org.gradle.jvmargs=-Xmx5g -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8
+          kotlin.compiler.execution.strategy=in-process
+          EOF
+
+      # Optional: if these repository secrets exist they replace the keystore
+      # committed under signing/. See signing/README.md before adding them —
+      # a different key means one uninstall/reinstall on the phone.
+      - name: Use signing key from secrets (optional)
+        env:
+          KEYSTORE_B64: ${{ secrets.HONDANA_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.HONDANA_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.HONDANA_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.HONDANA_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/hondana.jks"
+            {
+              echo "HONDANA_KEYSTORE=$RUNNER_TEMP/hondana.jks"
+              echo "HONDANA_KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD"
+              echo "HONDANA_KEY_ALIAS=$KEY_ALIAS"
+              echo "HONDANA_KEY_PASSWORD=$KEY_PASSWORD"
+            } >> "$GITHUB_ENV"
+            echo "Signing with the key from repository secrets."
+          else
+            echo "Signing with the committed key in signing/."
+          fi
+
+      - name: Build release APK
+        run: ./gradlew assembleRelease --stacktrace
+
+      - name: Collect APKs
+        id: collect
+        run: |
+          set -e
+          ls -la app/build/outputs/apk/release/
+          mkdir -p out
+          cp app/build/outputs/apk/release/app-universal-release.apk out/hondana.apk
+          cp app/build/outputs/apk/release/app-arm64-v8a-release.apk out/hondana-arm64-v8a.apk
+          cp app/build/outputs/apk/release/app-armeabi-v7a-release.apk out/hondana-armeabi-v7a.apk
+          echo "count=$(git rev-list --count HEAD)" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          ls -lh out/
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hondana-r${{ steps.collect.outputs.count }}-${{ steps.collect.outputs.sha }}
+          path: out/*.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload R8 mapping
+        uses: actions/upload-artifact@v4
+        with:
+          name: mapping-r${{ steps.collect.outputs.count }}
+          path: app/build/outputs/mapping/release
+          retention-days: 30
+
+      # A release asset is a plain link a phone browser can download, unlike a
+      # zipped workflow artifact. The release is recreated on every build so the
+      # tag always points at the commit the APK came from.
+      - name: Publish to the rolling release
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COUNT: ${{ steps.collect.outputs.count }}
+          SHA: ${{ steps.collect.outputs.sha }}
+        run: |
+          set -e
+          URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/hondana-latest"
+          NOTES=$(cat <<EOF
+          **[Download hondana.apk](${URL}/hondana.apk)**: works on every phone.
+
+          Smaller builds: [arm64-v8a](${URL}/hondana-arm64-v8a.apk) (almost every phone from 2017 on), [armeabi-v7a](${URL}/hondana-armeabi-v7a.apk) (older 32-bit phones).
+
+          Open a link on your Android phone and tap the file to install. Android asks you to allow installs from this browser the first time. Every build is signed with the same key, so new builds install over the old one and keep your library.
+
+          Build r${COUNT} from \`${SHA}\`. This release is replaced by every push to main.
+          EOF
+          )
+          gh release delete hondana-latest --cleanup-tag --yes >/dev/null 2>&1 || true
+          gh release create hondana-latest out/hondana.apk out/hondana-arm64-v8a.apk out/hondana-armeabi-v7a.apk \
+            --target "$GITHUB_SHA" \
+            --title "Hondana r${COUNT} (latest build)" \
+            --notes "$NOTES" \
+            --latest
+          echo "APK: ${URL}/hondana.apk"

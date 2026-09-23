@@ -1,21 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- HONDANA: app glyph (notification small icon, More-tab header). Resource
-     name kept from upstream so no call sites change. -->
+<!-- HONDANA: splash glyph, white bubble with coral 本 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
+    android:width="72dp"
+    android:height="72dp"
     android:viewportWidth="52"
     android:viewportHeight="52">
     <group
         android:translateX="-28"
         android:translateY="-30">
         <path
-            android:strokeColor="#FFFFFFFF"
-            android:strokeWidth="3.4"
-            android:strokeLineJoin="round"
+            android:fillColor="#FFFFFF"
             android:pathData="M41,32 H67 A11,11 0 0 1 78,43 V59 A11,11 0 0 1 67,70 H52 L38,80 L41,70 A11,11 0 0 1 30,59 V43 A11,11 0 0 1 41,32 Z" />
         <path
-            android:strokeColor="#FFFFFFFF"
+            android:strokeColor="#F26B38"
             android:strokeWidth="4.2"
             android:strokeLineCap="round"
             android:strokeLineJoin="round"
