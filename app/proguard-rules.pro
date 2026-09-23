@@ -336,4 +336,7 @@
 -dontwarn org.brotli.dec.**
 -dontwarn javax.lang.model.**
 -dontwarn com.google.errorprone.annotations.**
+# Jackson reads @ConstructorProperties/@Transient only when java.beans has them (not on Android).
+-dontwarn java.beans.ConstructorProperties
+-dontwarn java.beans.Transient
 # HONDANA <--

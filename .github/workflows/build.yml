@@ -86,7 +86,8 @@ jobs:
           fi
 
       - name: Build release APK
-        run: ./gradlew assembleRelease --stacktrace
+        # --continue: report every independent failure (compile, packaging, R8) in one run.
+        run: ./gradlew assembleRelease --stacktrace --continue
 
       - name: Collect APKs
         id: collect

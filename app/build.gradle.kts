@@ -172,6 +172,11 @@ android {
                 "META-INF/NOTICE",
                 "META-INF/README.md",
             )
+            // HONDANA -->
+            // Apache HttpClient 4 (Komikku's Google Drive sync) and HttpClient 5 (Anthropic SDK)
+            // both ship Mozilla's public suffix list. Either copy works for both.
+            pickFirsts += "mozilla/public-suffix-list.txt"
+            // HONDANA <--
         }
     }
 
