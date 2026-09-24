@@ -133,4 +133,11 @@
     <string name="hondana_blocked_message">This title is tagged as hentai, porn or similar. Hondana doesn\'t show sexual content, so it has been removed.</string>
     <string name="hondana_blocked_reader">This title has sexual content, so Hondana won\'t open it.</string>
     <string name="hondana_action_go_back">Go back</string>
+    <string name="hondana_pref_group_sources">Sources</string>
+    <string name="hondana_pref_install_missing">Install extensions for your library</string>
+    <string name="hondana_pref_install_missing_summary">Installs the extensions your library\'s titles come from, using your repos. Useful after restoring a Mihon backup.</string>
+    <string name="hondana_install_missing_checking">Checking your library…</string>
+    <string name="hondana_install_missing_none">Every source your library uses is installed</string>
+    <string name="hondana_install_missing_start">Installing %1$d extensions…</string>
+    <string name="hondana_install_missing_done">Installed %1$d of %2$d extensions</string>
 </resources>

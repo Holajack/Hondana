@@ -20,6 +20,9 @@ SQLDelight, fork markers. This file covers only what Hondana adds.
     `AutoScrollController`, `ReaderAssistant` (lens + read aloud),
     `ScreenCapture`, and Compose UI in `reader/ui/`.
   - `settings/`: Settings → Reading assistant.
+  - `extensions/`: `ExtensionSetup` repairs repos at launch (adds Keiyoushi's
+    `index.pb`, upgrades legacy entries, loads repo-vouched extensions) and
+    installs the extensions a restored library needs.
   - `safety/`: the always-on sexual-content filter. `AdultContentRules` (pure
     Kotlin word lists), `AdultContentFilter` (decisions, remembered blocked
     packages/source IDs), `AdultContentGuard` (startup: library cleanup,

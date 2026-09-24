@@ -4,10 +4,8 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import eu.kanade.tachiyomi.data.download.DownloadManager
-import eu.kanade.tachiyomi.extension.ExtensionManager
 import exh.source.ExhPreferences
 import exh.source.MANGADEX_IDS
-import hondana.core.Hondana
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -67,13 +65,6 @@ object AdultContentGuard {
             Injekt.get<MangaRepository>().getLibraryMangaAsFlow()
                 .onEach { library -> purge(library.map { it.manga }) }
                 .launchIn(this)
-
-            // Adult-only sources are recognised by ID from the repo listing. Until Hondana has
-            // seen one (first launch after installing or updating), fetch it once; the filter
-            // then clears library entries from those sources.
-            if (Hondana.preferences.blockedSourceIds().get().isEmpty()) {
-                runCatching { Injekt.get<ExtensionManager>().findAvailableExtensions() }
-            }
         }
     }
 

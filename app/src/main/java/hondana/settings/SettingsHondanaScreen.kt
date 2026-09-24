@@ -20,6 +20,7 @@ import hondana.core.Languages
 import hondana.core.ReadAloudText
 import hondana.core.TextEngine
 import hondana.core.TranslationEngine
+import hondana.extensions.ExtensionSetup
 import hondana.i18n.HMR
 import hondana.vocab.VocabScreen
 import kotlinx.collections.immutable.persistentListOf
@@ -29,6 +30,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import tachiyomi.core.common.i18n.stringResource
 import tachiyomi.presentation.core.i18n.stringResource
 import tachiyomi.presentation.core.util.collectAsState
 import java.util.Locale
@@ -63,6 +65,7 @@ object SettingsHondanaScreen : SearchableSettings {
                     ),
                 ),
             ),
+            sourcesGroup(context, scope),
             Preference.PreferenceGroup(
                 title = stringResource(HMR.strings.hondana_pref_group_content_filter),
                 preferenceItems = persistentListOf(
@@ -248,6 +251,34 @@ object SettingsHondanaScreen : SearchableSettings {
                         runCatching {
                             context.startActivity(
                                 Intent("com.android.settings.TTS_SETTINGS").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                            )
+                        }
+                    },
+                ),
+            ),
+        )
+    }
+
+    @Composable
+    private fun sourcesGroup(context: Context, scope: CoroutineScope): Preference.PreferenceGroup {
+        return Preference.PreferenceGroup(
+            title = stringResource(HMR.strings.hondana_pref_group_sources),
+            preferenceItems = persistentListOf(
+                Preference.PreferenceItem.TextPreference(
+                    title = stringResource(HMR.strings.hondana_pref_install_missing),
+                    subtitle = stringResource(HMR.strings.hondana_pref_install_missing_summary),
+                    onClick = {
+                        scope.launch {
+                            context.toast(context.stringResource(HMR.strings.hondana_install_missing_checking))
+                            val missing = withContext(Dispatchers.IO) { ExtensionSetup.missingLibraryExtensions() }
+                            if (missing.isEmpty()) {
+                                context.toast(context.stringResource(HMR.strings.hondana_install_missing_none))
+                                return@launch
+                            }
+                            context.toast(context.stringResource(HMR.strings.hondana_install_missing_start, missing.size))
+                            val installed = withContext(Dispatchers.IO) { ExtensionSetup.install(missing) }
+                            context.toast(
+                                context.stringResource(HMR.strings.hondana_install_missing_done, installed, missing.size),
                             )
                         }
                     },

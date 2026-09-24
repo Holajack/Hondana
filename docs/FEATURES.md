@@ -165,7 +165,16 @@ extensions.
 - **Read aloud**: original or translation, speech rate, per-character voices,
   automatic page turns, sound effects on or off.
 - **Auto-scroll**: long-strip speed, and whether touching the page pauses it.
+- **Sources → Install extensions for your library**: finds titles whose
+  source isn't installed (for example after restoring a Mihon backup) and
+  installs those extensions from your repos, one after another.
 - **Content filter**: a note on what the always-on filter blocks.
+
+At every launch Hondana also keeps its repos in step with Mihon: it adds the
+Keiyoushi repo (`index.pb`) if no repo carries Keiyoushi's signing key, moves
+legacy repo entries from older backups onto their current index, and loads
+extensions another app installed once their repo vouches for them. Code:
+`hondana/extensions/ExtensionSetup.kt`.
 
 Code: `hondana/settings/SettingsHondanaScreen.kt`, `hondana/core/HondanaPreferences.kt`.
 

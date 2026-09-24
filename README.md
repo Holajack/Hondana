@@ -36,9 +36,15 @@ asks you to allow installs from that browser.
    file.
 
 That restores your library, categories, reading history, trackers and
-extension repos. Extensions are separate apps, so reinstall the ones you use
-from **Browse → Extensions** once the repos are back. `tachiyomi://add-repo`
-and `mihon://extension-store` links also open in Hondana.
+extension repos. Hondana adds the Keiyoushi repo itself if it's missing, and
+upgrades repo entries from older backups to Keiyoushi's current index (the old
+one now lists only "Outdated App" placeholders).
+
+Extensions that Mihon installed as regular apps load in Hondana automatically.
+Ones Mihon installed privately (its *Private* installer) are invisible to other
+apps: install them in Hondana with **Settings → Reading assistant → Install
+extensions for your library**, or from **Browse → Extensions**.
+`tachiyomi://add-repo` and `mihon://extension-store` links also open in Hondana.
 
 ## Features
 

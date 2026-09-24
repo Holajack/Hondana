@@ -76,6 +76,7 @@ import exh.log.EHLogLevel
 import exh.log.EnhancedFilePrinter
 import exh.log.XLogLogcatLogger
 import exh.log.xLogD
+import hondana.extensions.ExtensionSetup
 import hondana.safety.AdultContentGuard
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
@@ -225,6 +226,7 @@ class App : Application(), DefaultLifecycleObserver, SingletonImageLoader.Factor
 
         // HONDANA -->
         AdultContentGuard.start(scope)
+        ExtensionSetup.start(scope)
         // HONDANA <--
 
         // Updates widget update
