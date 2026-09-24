@@ -89,6 +89,44 @@ object AdultContentRules {
         return genreStems.any { it in plain }
     }
 
+    // Extensions' own settings ("Show NSFW content", a content rating list with "Erotica").
+    // "Mature" is left out: it often means violence.
+    private val settingWords = setOf(
+        "nsfw", "hentai", "porn", "porno", "pornographic", "pornography", "erotic", "erotica", "ecchi",
+        "smut", "lewd", "r18", "explicit", "sexual", "adult", "adults", "nude", "nudity", "uncensored", "sfw",
+    )
+    private val settingStems = listOf("nsfw", "hentai", "porn", "erotic", "ecchi", "smut", "lewd", "uncensored")
+    private val hidingWords = setOf(
+        "hide", "hidden", "exclude", "excluded", "block", "blocked", "blur", "blurred", "filter", "censor",
+        "censored", "remove", "skip", "mask", "safe", "sfw",
+    )
+    private val negatingWords = setOf("no", "not", "don", "dont", "without", "disable", "disabled", "off")
+    private val safeChoiceWords = setOf("safe", "sfw", "general", "everyone", "kids", "hide", "hidden", "exclude", "none", "no", "off")
+
+    /** True for a source setting (a title, summary, key or list choice) about adult content. */
+    fun isAdultSetting(text: String?): Boolean {
+        if (text.isNullOrBlank()) return false
+        val raw = text.lowercase(Locale.ROOT).replace("young adult", "")
+        if ("18+" in raw || "+18" in raw || "r-18" in raw || cjkMarkers.any { it in raw }) return true
+        if (settingStems.any { it in raw }) return true
+        return words(raw).any { it in settingWords }
+    }
+
+    /**
+     * For a switch or list titled [title]: true when turning it on (or ticking a choice) keeps
+     * adult content out, as in "Hide NSFW", "Blur explicit covers" or "Exclude genres".
+     */
+    fun onKeepsAdultOut(title: String): Boolean {
+        val words = words(title.lowercase(Locale.ROOT))
+        return words.any { it in hidingWords } != words.any { it in negatingWords }
+    }
+
+    /** A list choice such as "Safe", "SFW only" or "Hide". */
+    fun isSafeChoice(label: String): Boolean = words(label.lowercase(Locale.ROOT)).any { it in safeChoiceWords }
+
+    /** A list choice that lets adult content in, such as "Erotica" or "NSFW only" (not "SFW only"). */
+    fun isAdultChoice(label: String?): Boolean = isAdultSetting(label) && !isSafeChoice(label.orEmpty())
+
     /** Lower-case words with accents removed; anything that isn't a letter or digit splits words. */
     private fun words(text: String): List<String> =
         stripAccents(text).split(nonWord).filter(String::isNotEmpty)

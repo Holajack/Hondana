@@ -39,6 +39,7 @@ import eu.kanade.tachiyomi.source.ConfigurableSource
 import eu.kanade.tachiyomi.source.sourcePreferences
 import eu.kanade.tachiyomi.widget.TachiyomiTextInputEditText.Companion.setIncognito
 import exh.source.EnhancedHttpSource
+import hondana.safety.AdultSourceSettings
 import tachiyomi.domain.source.service.SourceManager
 import tachiyomi.presentation.core.components.material.Scaffold
 import tachiyomi.presentation.core.screens.LoadingScreen
@@ -155,6 +156,10 @@ class SourcePreferencesFragment : PreferenceFragmentCompat() {
             preferenceManager.preferenceDataStore = dataStore
 
             source.setupPreferenceScreen(sourceScreen)
+            // HONDANA -->
+            // An extension's own adult-content switches and choices are removed (hondana.safety).
+            AdultSourceSettings.apply(sourceScreen, source.sourcePreferences())
+            // HONDANA <--
             sourceScreen.forEach { pref ->
                 pref.isIconSpaceReserved = false
                 pref.isSingleLineTitle = false

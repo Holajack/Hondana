@@ -111,9 +111,11 @@ Code: `hondana/vocab/`, stored in `hondana.db` (see below).
 
 Always on, with no switch to turn it off. Komikku's NSFW switches are gone too:
 *Settings → Browse → NSFW content*, the "NSFW only" buttons in the Sources and
-Extensions tabs, and the integrated E-Hentai switch. The filter targets sexual
-content and nudity only: violence, gore, *Mature* and general sites that are
-marked 18+ for other reasons stay available.
+Extensions tabs, and the integrated E-Hentai switch. Extensions' own settings
+lose theirs as well: a switch such as "Show NSFW content" is set to its safe
+position and hidden, and choices such as *Erotica* are taken out of content
+rating lists. The filter targets sexual content and nudity only: violence, gore,
+*Mature* and general sites that are marked 18+ for other reasons stay available.
 
 - **Adult-only extensions never load.** Repos rate every extension SAFE, MIXED
   or NSFW. NSFW means an adult-only site (hentai, doujin, porn, nude photos,

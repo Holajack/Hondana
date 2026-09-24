@@ -27,7 +27,8 @@ SQLDelight, fork markers. This file covers only what Hondana adds.
     Kotlin word lists), `AdultContentFilter` (decisions, remembered blocked
     packages/source IDs), `AdultContentGuard` (startup: library cleanup,
     MangaDex rating, E-Hentai off, NSFW preference kept on),
-    `AdultContentBlockedScreen`. The on-device nudity check: `NudityDetector`
+    `AdultContentBlockedScreen`, `AdultSourceSettings` (strips adult switches
+    and choices from extensions' settings). The on-device nudity check: `NudityDetector`
     (LiteRT + `assets/hondana/nsfw_mobilenet_v2.tflite`, thresholds),
     `NudityTiles` and `NudityResample` (pure Kotlin), `NudityScreen` (reader
     pages, the "hidden" card) and `NudityImageInterceptor` (Coil).
@@ -43,7 +44,8 @@ SQLDelight, fork markers. This file covers only what Hondana adds.
   `BrowseSourceScreenModel`, `SearchScreenModel`, `SourceFeedScreenModel`,
   `FeedScreenModel`, `RecommendsScreenModel`, `RecommendationSearchHelper`,
   `SettingsAdvancedScreen`, `SettingsBrowseScreen`, `SourcesTab`,
-  `ExtensionsTab`, `AnilistApi` and `MyAnimeListApi`; the nudity check into
+  `ExtensionsTab`, `SourcePreferencesScreen`, `AnilistApi` and
+  `MyAnimeListApi`; the nudity check into
   `PagerPageHolder`, `WebtoonPageHolder`, `ReaderViewModel` and `App`'s image
   loader.
 
