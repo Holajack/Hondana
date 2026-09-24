@@ -12,21 +12,33 @@ Komikku's own feature list is in [docs/KOMIKKU_README.md](docs/KOMIKKU_README.md
 
 ## Install
 
-**[Download hondana-arm64-v8a.apk](https://github.com/Holajack/Hondana/releases/download/hondana-latest/hondana-arm64-v8a.apk)**
+**[Download hondana-arm64-v8a.apk](https://github.com/Holajack/Hondana-releases/releases/latest/download/hondana-arm64-v8a.apk)**
 (almost every phone from 2017 on). If it won't install, use the universal
-[hondana.apk](https://github.com/Holajack/Hondana/releases/download/hondana-latest/hondana.apk),
+[hondana.apk](https://github.com/Holajack/Hondana-releases/releases/latest/download/hondana.apk),
 which is larger.
 
-These links always serve the newest build, because every push to `main`
-replaces them. The repo is private, so sign in to GitHub in your phone's browser
-first. Then open the link and tap the downloaded file. The first time, Android
-asks you to allow installs from that browser.
+These links are public (no GitHub sign-in needed), so they work for friends
+too. Open one on the phone and tap the downloaded file. The first time, Android
+asks you to allow installs from that browser. If Chrome stalls on the download,
+use Firefox.
 
 - Requires Android 8.0 (API 26) or newer.
 - Installs **next to** Mihon or Komikku (package `com.holajack.hondana`), so you
   can try it without touching your current app.
 - Every build is signed with the same key, so a new build installs over the
   old one and keeps your library.
+
+### Updates
+
+Hondana checks [Hondana-releases](https://github.com/Holajack/Hondana-releases/releases)
+for new builds, like Mihon does: when one is out it shows what's new with a
+**Download** button, and a notification when the app is closed. Check now under
+**More → About → Check for updates**. On Android 12+ it downloads updates in the
+background on Wi-Fi and, once Hondana installed the previous update itself,
+installs them without asking.
+
+Every push to `main` builds a new version (tagged `r<build number>`); the ten
+newest stay on the releases page. The source stays in this private repo.
 
 ### Bring your existing setup over
 

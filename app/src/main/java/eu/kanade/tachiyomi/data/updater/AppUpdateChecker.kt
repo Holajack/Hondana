@@ -36,7 +36,10 @@ class AppUpdateChecker(
             val result = getApplicationRelease.await(
                 GetApplicationRelease.Arguments(
                     isFoss = isFossBuildType,
-                    isPreview = isPreviewBuildType || peekIntoPreview,
+                    // HONDANA -->
+                    // Hondana releases are numbered by build (r<commit count>), like Komikku previews.
+                    isPreview = HONDANA_NUMBERED_RELEASES || isPreviewBuildType || peekIntoPreview,
+                    // HONDANA <--
                     commitCount = BuildConfig.COMMIT_COUNT.toInt(),
                     versionName = BuildConfig.VERSION_NAME,
                     repository = getGithubRepo(peekIntoPreview),
@@ -82,7 +85,9 @@ class AppUpdateChecker(
             getApplicationRelease.awaitReleaseNotes(
                 GetApplicationRelease.Arguments(
                     isFoss = isFossBuildType,
-                    isPreview = isPreviewBuildType || peekIntoPreview,
+                    // HONDANA -->
+                    isPreview = HONDANA_NUMBERED_RELEASES || isPreviewBuildType || peekIntoPreview,
+                    // HONDANA <--
                     commitCount = BuildConfig.COMMIT_COUNT.toInt(),
                     versionName = BuildConfig.VERSION_NAME,
                     repository = getGithubRepo(peekIntoPreview),
@@ -93,9 +98,23 @@ class AppUpdateChecker(
     // KMK <--
 }
 
+// HONDANA -->
+/**
+ * Hondana's builds are published to a public repo of APKs only (the source repo is private,
+ * and GitHub's release API can't be read anonymously there). Each build is tagged r<commit count>.
+ */
+const val HONDANA_RELEASES_REPO = "Holajack/Hondana-releases"
+private const val HONDANA_NUMBERED_RELEASES = true
+// HONDANA <--
+
 val GITHUB_REPO: String by lazy { getGithubRepo() }
 
 fun getGithubRepo(peekIntoPreview: Boolean = false): String =
+    // HONDANA -->
+    if (HONDANA_NUMBERED_RELEASES) {
+        HONDANA_RELEASES_REPO
+    } else
+    // HONDANA <--
     if (isPreviewBuildType || peekIntoPreview) {
         "komikku-app/komikku-preview"
     } else {
@@ -105,7 +124,7 @@ fun getGithubRepo(peekIntoPreview: Boolean = false): String =
 val RELEASE_TAG: String by lazy { getReleaseTag() }
 
 fun getReleaseTag(peekIntoPreview: Boolean = false): String =
-    if (isPreviewBuildType || peekIntoPreview) {
+    if (/* HONDANA --> */HONDANA_NUMBERED_RELEASES || /* HONDANA <-- */isPreviewBuildType || peekIntoPreview) {
         "r${BuildConfig.COMMIT_COUNT}"
     } else {
         "v${BuildConfig.VERSION_NAME}"

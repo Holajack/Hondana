@@ -87,7 +87,8 @@ jobs:
 
       - name: Build release APK
         # --continue: report every independent failure (compile, packaging, R8) in one run.
-        run: ./gradlew assembleRelease --stacktrace --continue
+        # -Penable-updater: the app checks Hondana-releases for new builds (see below).
+        run: ./gradlew assembleRelease --stacktrace --continue -Penable-updater
 
       - name: Collect APKs
         id: collect
@@ -146,3 +147,52 @@ jobs:
             --notes "$NOTES" \
             --latest
           echo "APK: ${URL}/hondana.apk"
+
+      # The in-app updater reads GitHub's release API, which can't see this private
+      # repo without a login. So every build is also published to a public repo that
+      # holds APKs only, tagged r<commit count> (the app compares that number with its
+      # own). Needs a RELEASES_TOKEN secret: a fine-grained token with "Contents: Read
+      # and write" on Holajack/Hondana-releases. Without it this step is skipped.
+      - name: Publish to Hondana-releases (in-app updates)
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+          RELEASES_REPO: Holajack/Hondana-releases
+          COUNT: ${{ steps.collect.outputs.count }}
+          SHA: ${{ steps.collect.outputs.sha }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          set -e
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning::RELEASES_TOKEN is not set, so r${COUNT} was not published to ${RELEASES_REPO} and the in-app updater won't offer it."
+            exit 0
+          fi
+          TAG="r${COUNT}"
+          # What's new: the commits in this push (the app shows this text in its update screen).
+          if [ -n "$BEFORE" ] && git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+            CHANGES=$(git log --no-merges -n 30 --format='- %s' "${BEFORE}..${GITHUB_SHA}")
+          fi
+          [ -n "$CHANGES" ] || CHANGES=$(git log -1 --format='- %s' "$GITHUB_SHA")
+          URL="https://github.com/${RELEASES_REPO}/releases/latest/download"
+          NOTES=$(cat <<EOF
+          ${CHANGES}
+
+          **Install:** [hondana-arm64-v8a.apk](${URL}/hondana-arm64-v8a.apk) for almost every phone from 2017 on, or [hondana.apk](${URL}/hondana.apk) (universal, larger). Hondana updates itself after that: it checks this page and offers new builds.
+
+          Build ${TAG} from \`${SHA}\`.
+          EOF
+          )
+          if gh release view "$TAG" --repo "$RELEASES_REPO" >/dev/null 2>&1; then
+            gh release upload "$TAG" out/hondana.apk out/hondana-arm64-v8a.apk out/hondana-armeabi-v7a.apk \
+              --repo "$RELEASES_REPO" --clobber
+          else
+            gh release create "$TAG" out/hondana.apk out/hondana-arm64-v8a.apk out/hondana-armeabi-v7a.apk \
+              --repo "$RELEASES_REPO" \
+              --title "Hondana ${TAG}" \
+              --notes "$NOTES" \
+              --latest
+          fi
+          # Keep the ten newest builds.
+          gh release list --repo "$RELEASES_REPO" --limit 100 --json tagName --jq '.[10:][].tagName' |
+            while read -r old; do gh release delete "$old" --repo "$RELEASES_REPO" --cleanup-tag --yes; done
+          echo "Published https://github.com/${RELEASES_REPO}/releases/tag/${TAG}"

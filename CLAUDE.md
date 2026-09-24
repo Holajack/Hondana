@@ -33,7 +33,7 @@ SQLDelight, fork markers. This file covers only what Hondana adds.
   Today that is `ReaderActivity`, `ReaderAppBars`, `SettingsMainScreen`,
   `app/build.gradle.kts`, `settings.gradle.kts`, `gradle/libs.versions.toml`,
   `app/proguard-rules.pro`, `.gitignore`, and the launcher/splash drawables.
-  The content filter hooks into `App`, `ExtensionLoader`, `ExtensionManager`,
+  The updater hook is in `AppUpdateChecker`. The content filter hooks into `App`, `ExtensionLoader`, `ExtensionManager`,
   `AndroidSourceManager`, `Extension` (domain), `NetworkExtensionStore`,
   `NetworkLegacyExtension`, `BackupRestorer`, `MangaScreen`, `MangaScreenModel`,
   `BrowseSourceScreenModel`, `SearchScreenModel`, `SourceFeedScreenModel`,
@@ -58,8 +58,12 @@ SQLDelight, fork markers. This file covers only what Hondana adds.
 ## Building
 
 GitHub Actions (`.github/workflows/build.yml`) builds `assembleRelease` on every
-push to `main`. It publishes `hondana.apk` to the `hondana-latest` release and
-uploads the APKs as a workflow artifact. A clean build takes about 30–40
+push to `main` (with `-Penable-updater`). It uploads the APKs as a workflow
+artifact, refreshes the private `hondana-latest` release, and publishes the
+build to the public **Holajack/Hondana-releases** repo as release
+`r<commit count>` (needs the `RELEASES_TOKEN` secret; skipped with a warning
+otherwise). The in-app updater (`AppUpdateChecker`, `HONDANA_RELEASES_REPO`)
+reads that public repo and compares its `r` number with `BuildConfig.COMMIT_COUNT`. A clean build takes about 30–40
 minutes on the free 2-core runner, less with a warm Gradle cache.
 
 Locally (needs JDK 21 and Android SDK 36):
