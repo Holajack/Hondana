@@ -57,6 +57,7 @@ import exh.source.getMainSource
 import exh.source.isEhBasedManga
 import exh.util.defaultReaderType
 import exh.util.mangaType
+import hondana.failover.ChapterLoadErrors
 import hondana.safety.NudityScreen
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -610,6 +611,9 @@ class ReaderViewModel @JvmOverloads constructor(
                 throw e
             }
             logcat(LogPriority.ERROR, e)
+            // HONDANA -->
+            ChapterLoadErrors.report(chapter.chapter.id, e, opening = true)
+            // HONDANA <--
         } finally {
             mutableState.update { it.copy(isLoadingAdjacentChapter = false) }
         }
@@ -658,6 +662,9 @@ class ReaderViewModel @JvmOverloads constructor(
             if (e is CancellationException) {
                 throw e
             }
+            // HONDANA -->
+            ChapterLoadErrors.report(chapter.chapter.id, e, opening = false)
+            // HONDANA <--
             return
         }
         eventChannel.trySend(Event.ReloadViewerChapters)

@@ -257,6 +257,10 @@ class ReaderActivity : BaseActivity() {
                 if (!initResult.getOrDefault(false)) {
                     val exception = initResult.exceptionOrNull() ?: IllegalStateException("Unknown err")
                     withUIContext {
+                        // HONDANA -->
+                        // The source's site is down: look for the series on the other sources.
+                        if (hondana.failover.onOpeningFailed(chapter, exception)) return@withUIContext
+                        // HONDANA <--
                         setInitialChapterError(exception)
                     }
                 }

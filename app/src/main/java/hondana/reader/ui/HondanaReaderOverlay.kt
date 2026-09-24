@@ -14,7 +14,7 @@ import eu.kanade.tachiyomi.ui.reader.ReaderViewModel
 import hondana.reader.HondanaReader
 import hondana.vocab.WordsDialog
 
-/** Hondana's layer over the reader: auto-scroll controls, read-aloud, the lens and its sheets. */
+/** Hondana's layer over the reader: auto-scroll controls, read-aloud, the lens, source switching and sheets. */
 @Composable
 fun HondanaReaderOverlay(reader: HondanaReader, state: ReaderViewModel.State) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -28,6 +28,7 @@ fun HondanaReaderOverlay(reader: HondanaReader, state: ReaderViewModel.State) {
                 .padding(bottom = 40.dp),
         )
         LensOverlay(reader)
+        FailoverCard(reader.failover, state)
     }
 
     val sheet by reader.sheet.collectAsState()

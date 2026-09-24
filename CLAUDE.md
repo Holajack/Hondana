@@ -23,6 +23,12 @@ SQLDelight, fork markers. This file covers only what Hondana adds.
   - `extensions/`: `ExtensionSetup` repairs repos at launch (adds Keiyoushi's
     `index.pb`, upgrades legacy entries, loads repo-vouched extensions) and
     installs the extensions a restored library needs.
+  - `failover/`: switching sources when a site is down. `TitleMatch` (pure
+    Kotlin same-series test), `SourceHealth` (down site vs offline phone),
+    `SourceFailover` (search candidates, verify the chapter, migrate with
+    Komikku's `MigrateMangaUseCase`), `ChapterLoadErrors` (reported by
+    `ReaderViewModel`). The reader side is `hondana/reader/ReaderFailover` and
+    `reader/ui/FailoverCard`.
   - `safety/`: the always-on sexual-content filter. `AdultContentRules` (pure
     Kotlin word lists), `AdultContentFilter` (decisions, remembered blocked
     packages/source IDs), `AdultContentGuard` (startup: library cleanup,
@@ -47,7 +53,8 @@ SQLDelight, fork markers. This file covers only what Hondana adds.
   `ExtensionsTab`, `SourcePreferencesScreen`, `AnilistApi` and
   `MyAnimeListApi`; the nudity check into
   `PagerPageHolder`, `WebtoonPageHolder`, `ReaderViewModel` and `App`'s image
-  loader.
+  loader. Source switching hooks into `ReaderActivity` (opening error) and
+  `ReaderViewModel` (`loadAdjacent`, `preload`).
 
 ## Rules
 

@@ -17,6 +17,7 @@ class HondanaReader(val activity: ReaderActivity) {
 
     val autoScroll = AutoScrollController(activity)
     val assistant = ReaderAssistant(activity, autoScroll)
+    val failover = ReaderFailover(activity)
 
     /** Which Hondana sheet is open over the reader, if any. */
     val sheet = MutableStateFlow(Sheet.NONE)
@@ -32,6 +33,7 @@ class HondanaReader(val activity: ReaderActivity) {
 
     fun attach() {
         autoScroll.attach()
+        failover.attach()
         assistant.messages
             .onEach { activity.toast(it) }
             .launchIn(activity.lifecycleScope)

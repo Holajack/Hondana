@@ -107,6 +107,43 @@ Fields: term, reading, meaning, sentence, sentence translation, source.
 
 Code: `hondana/vocab/`, stored in `hondana.db` (see below).
 
+## Source switching: keep reading when a site is down
+
+Sites go down, move to a new address, or change so their extension breaks. Instead
+of a cryptic error ("HTTP error 522") that looks like a phone problem, Hondana
+finds the series on your other sources and carries on.
+
+- **When it happens**: a chapter won't open, or opens but none of its pages load,
+  while the phone is online. Hondana shows "Asura Scans isn't responding. Looking
+  for Solo Leveling on your other sources…", then moves the series and reopens
+  the reader on the same chapter.
+- **What moves**: the library entry, with read chapters, bookmarks, reading
+  history, categories, trackers, notes and custom cover (the same as Komikku's
+  Migrate). Downloads stay where they are. A title that isn't in your library is
+  simply read from the new source.
+- **Next chapter**: if the next chapter fails to preload while you read, the
+  search runs in the background and a "Continue on …" button appears at the end
+  of the chapter.
+- **Which sources**: your migration sources (Browse → Migrate) first, then
+  sources you already use in your library, pinned sources, then any other source
+  in the same language, up to 20. Sources that failed in the last half hour and
+  sources the content filter blocks are skipped.
+- **Only a sure match**: the title must be the same after ignoring case,
+  punctuation, accents, "The" and bracketed tags ("[Official]"), with no
+  different numbers or words like "not" (so "Solo Leveling: Ragnarok",
+  "Jujutsu Kaisen 0" and side stories don't count). Names from the
+  description's "Alternative:" line are tried too. The new source must also have
+  the chapter you were opening. Otherwise Hondana says it wasn't found and
+  offers a global search.
+- **Offline**: when the phone itself has no internet, nothing moves.
+
+Turn it off under Settings → Reading assistant → Sources → Switch sources when
+one is down. To go back to the original source later, use Migrate as usual.
+
+Code: `hondana/failover/` (`TitleMatch` is plain Kotlin and was checked on pairs of
+real titles; `SourceFailover` searches and moves; `SourceHealth` tells a down
+site from an offline phone) and `hondana/reader/ReaderFailover` with its card.
+
 ## Content filter: no sexual content
 
 Always on, with no switch to turn it off. Komikku's NSFW switches are gone too:
@@ -187,6 +224,8 @@ through Coil).
 - **Read aloud**: original or translation, speech rate, per-character voices,
   automatic page turns, sound effects on or off.
 - **Auto-scroll**: long-strip speed, and whether touching the page pauses it.
+- **Sources → Switch sources when one is down**: on by default; see
+  [Source switching](#source-switching-keep-reading-when-a-site-is-down).
 - **Sources → Install extensions for your library**: finds titles whose
   source isn't installed (for example after restoring a Mihon backup) and
   installs those extensions from your repos, one after another.

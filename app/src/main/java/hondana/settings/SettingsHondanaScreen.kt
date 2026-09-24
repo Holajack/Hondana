@@ -65,7 +65,7 @@ object SettingsHondanaScreen : SearchableSettings {
                     ),
                 ),
             ),
-            sourcesGroup(context, scope),
+            sourcesGroup(context, scope, preferences),
             Preference.PreferenceGroup(
                 title = stringResource(HMR.strings.hondana_pref_group_content_filter),
                 preferenceItems = persistentListOf(
@@ -260,10 +260,19 @@ object SettingsHondanaScreen : SearchableSettings {
     }
 
     @Composable
-    private fun sourcesGroup(context: Context, scope: CoroutineScope): Preference.PreferenceGroup {
+    private fun sourcesGroup(
+        context: Context,
+        scope: CoroutineScope,
+        preferences: HondanaPreferences,
+    ): Preference.PreferenceGroup {
         return Preference.PreferenceGroup(
             title = stringResource(HMR.strings.hondana_pref_group_sources),
             preferenceItems = persistentListOf(
+                Preference.PreferenceItem.SwitchPreference(
+                    preference = preferences.switchSourcesWhenDown(),
+                    title = stringResource(HMR.strings.hondana_pref_switch_sources),
+                    subtitle = stringResource(HMR.strings.hondana_pref_switch_sources_summary),
+                ),
                 Preference.PreferenceItem.TextPreference(
                     title = stringResource(HMR.strings.hondana_pref_install_missing),
                     subtitle = stringResource(HMR.strings.hondana_pref_install_missing_summary),

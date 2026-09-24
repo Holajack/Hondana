@@ -73,6 +73,9 @@ Everything from Komikku, plus a row of reading tools in the reader menu:
   for each character, then on to the next page. Read the original for listening
   practice, or the translation as an audio drama.
 - **Saved words** with New / Learning / Known status, AnkiDroid and TSV export.
+- **Keeps reading when a site is down**: if a chapter won't load, Hondana finds
+  the series on your other sources, moves it there with your progress, and
+  reopens the chapter. See [Source switching](docs/FEATURES.md#source-switching-keep-reading-when-a-site-is-down).
 - **No sexual content**, always, with no NSFW switch: adult-only extensions
   never load, general sites stay but lose their adult sections, titles tagged
   as sexual content (ecchi included) are hidden and removed, and every page and

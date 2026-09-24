@@ -60,6 +60,11 @@ class HondanaPreferences(private val store: PreferenceStore) {
 
     fun lensShowTranslations() = store.getBoolean("hondana_lens_show_translations", false)
 
+    // Sources (see hondana.failover).
+
+    /** When a chapter won't load because its site is down, move the series to another source. */
+    fun switchSourcesWhenDown() = store.getBoolean("hondana_switch_sources_when_down", true)
+
     // Content filter (see hondana.safety). Remembered from repo indexes, not user settings, so
     // they're app state and stay out of backups.
 
