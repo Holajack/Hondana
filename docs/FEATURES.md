@@ -151,7 +151,7 @@ Always on, with no switch to turn it off. Komikku's NSFW switches are gone too:
 Extensions tabs, and the integrated E-Hentai switch. Extensions' own settings
 lose theirs as well: a switch such as "Show NSFW content" is set to its safe
 position and hidden, and choices such as *Erotica* are taken out of content
-rating lists. The filter targets sexual content and nudity only: violence, gore,
+rating lists. The filter targets sexual content only: violence, gore,
 *Mature* and general sites that are marked 18+ for other reasons stay available.
 
 - **Adult-only extensions never load.** Repos rate every extension SAFE, MIXED
@@ -170,14 +170,10 @@ rating lists. The filter targets sexual content and nudity only: violence, gore,
   Pornographic*, is replaced by a "Blocked" screen as soon as its details load.
   It won't open in the reader and is deleted from the database, with its
   downloads.
-- **Pages and covers are checked for nudity, on the phone.** Before a page is
-  shown, Hondana looks at it with a small image model bundled in the app
-  (GantMan's open NSFW model, MobileNet V2, 6.5 MB); nothing is uploaded. It
-  checks the whole page and overlapping parts of it, so a figure in one panel
-  counts too, and it checks webtoon strips panel by panel. A page that shows
-  nudity is replaced by a grey "Page hidden" card and can't be saved, shared or
-  set as a cover. Covers, page previews and other pictures get the same check
-  and show a grey "Hidden" card instead.
+- **Chapters aren't censored.** The filter works on sources and titles only.
+  Pages, downloads and covers from allowed sources are shown as they are; an
+  earlier picture check that hid pages it judged to show nudity was removed
+  because it hid ordinary pages too.
 - **MangaDex** is kept at its own *Safe + Suggestive* content rating, so its
   listings never include erotica or pornographic titles.
 - **Backups and your existing library**: restoring a backup skips titles from
@@ -188,21 +184,13 @@ rating lists. The filter targets sexual content and nudity only: violence, gore,
 
 Repos without ratings fall back to site names (hentai, porn, 18+, and so on).
 
-**Limits.** The image check is a statistical model, not a person. Its
-thresholds were set so that ordinary pages aren't hidden: on 63 manga pages and
-anime pictures and 40 webtoon-style strips with no nudity, it hid none. It
-hasn't been measured on a collection of nude images, so nudity that is small,
-partly covered or very stylised can still get through, and now and then an
-innocent page may be hidden. Tell the maintainer about a source, tag or page
-that slips through.
+Titles are judged by their genres and title, so a title with no sexual tags on a
+general site stays available. Tell the maintainer about a source or tag that
+slips through.
 
 Code: `hondana/safety/`. The rules (`AdultContentRules`) are plain Kotlin and
 were checked against Keiyoushi's full index: they flag none of its 579 SAFE
-extensions. The image check is `NudityDetector` (model and thresholds),
-`NudityTiles` (where it looks), `NudityResample` (Lanczos shrinking; plain
-bilinear shrinking turns screentones into noise the model mistakes for skin),
-`NudityScreen` (reader pages) and `NudityImageInterceptor` (everything loaded
-through Coil).
+extensions.
 
 ## Settings → Reading assistant
 
@@ -229,7 +217,7 @@ through Coil).
 - **Sources → Install extensions for your library**: finds titles whose
   source isn't installed (for example after restoring a Mihon backup) and
   installs those extensions from your repos, one after another.
-- **Content filter**: a note on what the always-on filter blocks and checks.
+- **Content filter**: a note on what the always-on filter blocks.
 
 At every launch Hondana also keeps its repos in step with Mihon: it adds the
 Keiyoushi repo (`index.pb`) if no repo carries Keiyoushi's signing key, moves

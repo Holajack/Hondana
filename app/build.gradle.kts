@@ -390,10 +390,6 @@ dependencies {
     implementation("com.google.mlkit:translate:17.0.3")
     // Claude, through the official Anthropic Java SDK.
     implementation("com.anthropic:anthropic-java:2.39.0")
-    // On-device nudity check for pages and covers (hondana.safety.NudityDetector). LiteRT is
-    // TensorFlow Lite's current name; unlike TensorFlow Lite 2.16 its native library is built for
-    // phones with 16 KB memory pages.
-    implementation("com.google.ai.edge.litert:litert:1.4.0")
     // HONDANA <--
 }
 

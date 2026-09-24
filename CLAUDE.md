@@ -34,10 +34,9 @@ SQLDelight, fork markers. This file covers only what Hondana adds.
     packages/source IDs), `AdultContentGuard` (startup: library cleanup,
     MangaDex rating, E-Hentai off, NSFW preference kept on),
     `AdultContentBlockedScreen`, `AdultSourceSettings` (strips adult switches
-    and choices from extensions' settings). The on-device nudity check: `NudityDetector`
-    (LiteRT + `assets/hondana/nsfw_mobilenet_v2.tflite`, thresholds),
-    `NudityTiles` and `NudityResample` (pure Kotlin), `NudityScreen` (reader
-    pages, the "hidden" card) and `NudityImageInterceptor` (Coil).
+    and choices from extensions' settings). It works on sources and titles
+    only: pages and covers are never hidden (the owner asked for that after an
+    image check hid ordinary pages).
 - `i18n-hondana/`: Hondana strings (moko-resources, class `hondana.i18n.HMR`).
   Edit only `base/strings.xml`.
 - Edits to upstream files are wrapped in `// HONDANA -->` … `// HONDANA <--`.
@@ -51,10 +50,8 @@ SQLDelight, fork markers. This file covers only what Hondana adds.
   `FeedScreenModel`, `RecommendsScreenModel`, `RecommendationSearchHelper`,
   `SettingsAdvancedScreen`, `SettingsBrowseScreen`, `SourcesTab`,
   `ExtensionsTab`, `SourcePreferencesScreen`, `AnilistApi` and
-  `MyAnimeListApi`; the nudity check into
-  `PagerPageHolder`, `WebtoonPageHolder`, `ReaderViewModel` and `App`'s image
-  loader. Source switching hooks into `ReaderActivity` (opening error) and
-  `ReaderViewModel` (`loadAdjacent`, `preload`).
+  `MyAnimeListApi`. Source switching hooks into `ReaderActivity` (opening
+  error) and `ReaderViewModel` (`loadAdjacent`, `preload`).
 
 ## Rules
 
@@ -70,7 +67,8 @@ SQLDelight, fork markers. This file covers only what Hondana adds.
    `claude-opus-5`; the user picks others in settings.
 6. The content filter (`hondana/safety`) has no off switch, by the owner's
    choice. Don't add one, and don't bring back Komikku's NSFW switches. It
-   blocks sexual content and nudity only, not violence or gore.
+   blocks sexual content only, not violence or gore, and only at the level of
+   sources and titles: never hide or blur pages inside a chapter.
 
 ## Building
 

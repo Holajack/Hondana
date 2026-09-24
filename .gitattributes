@@ -24,7 +24,6 @@
 *.swp binary
 
 # HONDANA -->
-# The nudity model and the encrypted signing key must be stored byte for byte.
-*.tflite binary
+# The encrypted signing key must be stored byte for byte.
 *.gpg binary
 # HONDANA <--

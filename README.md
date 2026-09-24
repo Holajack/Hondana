@@ -77,10 +77,10 @@ Everything from Komikku, plus a row of reading tools in the reader menu:
   the series on your other sources, moves it there with your progress, and
   reopens the chapter. See [Source switching](docs/FEATURES.md#source-switching-keep-reading-when-a-site-is-down).
 - **No sexual content**, always, with no NSFW switch: adult-only extensions
-  never load, general sites stay but lose their adult sections, titles tagged
-  as sexual content (ecchi included) are hidden and removed, and every page and
-  cover is checked for nudity on the phone before it's shown. Violence and gore
-  aren't filtered. See [Content filter](docs/FEATURES.md#content-filter-no-sexual-content).
+  never load, general sites stay but lose their adult sections, and titles
+  tagged as sexual content (ecchi included) are hidden and removed. Chapters
+  themselves are never censored, and violence and gore aren't filtered. See
+  [Content filter](docs/FEATURES.md#content-filter-no-sexual-content).
 
 Text recognition and translation work offline on the phone (Google ML Kit:
 Latin, Japanese, Chinese and Korean scripts). Add a Claude API key under

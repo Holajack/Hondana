@@ -44,13 +44,6 @@ jobs:
           # versionCode is the commit count, which needs full history.
           fetch-depth: 0
 
-      # The nudity model has to reach the APK byte for byte; a text conversion would break it
-      # silently (see .gitattributes). Update the checksum when the model changes.
-      - name: Check the nudity model
-        run: |
-          echo "da94d716891dce9567ef70c7a66dd2f09af764459bd66b2f4eed6cb9c4d0ad16  app/src/main/assets/hondana/nsfw_mobilenet_v2.tflite" |
-            sha256sum --check
-
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
