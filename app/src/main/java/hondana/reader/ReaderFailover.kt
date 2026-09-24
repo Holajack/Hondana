@@ -16,6 +16,7 @@ import hondana.failover.ChapterLoadErrors
 import hondana.failover.SourceFailover
 import hondana.failover.SourceHealth
 import hondana.i18n.HMR
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -178,7 +179,15 @@ class ReaderFailover(private val activity: ReaderActivity) {
             }
             SourceHealth.markDown(manga.source)
             logcat(LogPriority.INFO) { "$sourceName isn't working; looking for ${manga.title} elsewhere" }
-            val replacement = engine.findReplacement(manga, wanted)
+            // Whatever goes wrong while searching, the reader must not crash over it.
+            val replacement = try {
+                engine.findReplacement(manga, wanted)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Throwable) {
+                logcat(LogPriority.ERROR, e) { "Looking for ${manga.title} elsewhere failed" }
+                null
+            }
             when {
                 replacement != null && switchWhenFound -> switchTo(manga, replacement)
                 replacement != null -> mutableStatus.value = Status.Ready(sourceName, replacement)
@@ -201,15 +210,24 @@ class ReaderFailover(private val activity: ReaderActivity) {
         val sourceName = sourceName(manga)
         mutableStatus.value = Status.Moving(replacement.sourceName)
         activity.lifecycleScope.launch {
-            val moved = engine.moveLibraryEntry(manga, replacement.manga)
-            val message = if (moved) {
+            val moved = try {
+                engine.moveLibraryEntry(manga, replacement.manga)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Throwable) {
+                logcat(LogPriority.ERROR, e) { "Moving ${manga.title} failed" }
+                false
+            }
+            val message = if (moved && replacement.manga.source == manga.source) {
+                activity.stringResource(HMR.strings.hondana_failover_new_address, manga.title, sourceName)
+            } else if (moved) {
                 activity.stringResource(HMR.strings.hondana_failover_moved, sourceName, manga.title, replacement.sourceName)
             } else {
                 activity.stringResource(HMR.strings.hondana_failover_reading_from, sourceName, replacement.sourceName)
             }
             activity.toast(message, Toast.LENGTH_LONG)
             activity.finish()
-            activity.startActivity(ReaderActivity.newIntent(activity, replacement.manga.id, replacement.chapter.id))
+            activity.startActivity(ReaderActivity.newIntent(activity, replacement.manga.id, replacement.chapter?.id))
         }
     }
 

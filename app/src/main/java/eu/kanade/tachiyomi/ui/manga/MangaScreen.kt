@@ -92,6 +92,7 @@ import exh.source.getMainSource
 import exh.source.isEhBasedSource
 import exh.ui.metadata.MetadataViewScreen
 import exh.ui.smartsearch.SmartSearchScreen
+import hondana.failover.ui.FindElsewhere
 import hondana.safety.AdultContentBlockedScreen
 import hondana.safety.AdultContentFilter
 import kotlinx.coroutines.CancellationException
@@ -219,7 +220,19 @@ class MangaScreen(
         TachiyomiTheme(
             seedColor = seedColor.takeIf { screenModel.themeCoverBased },
         ) {
-            content()
+            // HONDANA -->
+            // "Find on another source" in the menu, and after a refresh fails because the site is down.
+            FindElsewhere(
+                manga = successState.manga,
+                source = successState.source,
+                onOpenTitle = { navigator.replace(MangaScreen(it)) },
+                onSearchByHand = { navigator.push(GlobalSearchScreen(it)) },
+            ) {
+                // HONDANA <--
+                content()
+                // HONDANA -->
+            }
+            // HONDANA <--
         }
 
         BulkFavoriteDialogs(

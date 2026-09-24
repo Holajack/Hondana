@@ -38,6 +38,7 @@ import kotlin.math.abs
  *
  * Only a strict match counts: nearly the same title ([TitleMatch]) and, when the chapter being
  * opened has a number, that same chapter on the new source. Sources are tried in this order: the
+ * title's own source (sites move series to new addresses, which shows as "HTTP error 404"), the
  * user's migration sources (Browse → Migrate), sources already used in the library, pinned
  * sources, then any other source in the same language.
  */
@@ -54,18 +55,27 @@ class SourceFailover(
 
     class Replacement(
         val manga: Manga,
-        /** The chapter to open on the new source. */
-        val chapter: Chapter,
+        /** The chapter asked for, on the new source; null when none was asked for. */
+        val chapter: Chapter?,
         val sourceName: String,
+        /** The highest chapter number the new source has, if any is numbered. */
+        val latestChapter: Double?,
     )
 
     /**
-     * Looks for [manga] on the other installed sources. [wanted] is the chapter the reader was
-     * opening; the replacement must have it (by number, or by name when it has no number).
+     * Looks for [manga] on the other installed sources. When [wanted] is given (the chapter being
+     * opened), the replacement must have it, by number or by name when it has no number.
+     * [includeOwnSource] also checks the title's own source for a new address.
      */
-    suspend fun findReplacement(manga: Manga, wanted: Chapter): Replacement? = withIOContext {
+    suspend fun findReplacement(
+        manga: Manga,
+        wanted: Chapter?,
+        includeOwnSource: Boolean = true,
+    ): Replacement? = withIOContext {
         val titles = (listOf(manga.title) + TitleMatch.alternativeTitles(manga.description)).distinct()
-        val sources = candidateSources(manga)
+        // The own source first: a series that only moved to a new address stays where it was.
+        val own = (sourceManager.get(manga.source) as? CatalogueSource)?.takeIf { includeOwnSource && it !is MergedSource }
+        val sources = listOfNotNull(own) + candidateSources(manga)
         logcat(LogPriority.INFO) { "Looking for ${manga.title} on ${sources.size} other sources" }
 
         // Search every candidate, a few at a time; keep whatever was found when time runs out.
@@ -74,7 +84,8 @@ class SourceFailover(
         withTimeoutOrNull(SEARCH_TIMEOUT_MS) {
             coroutineScope {
                 sources.forEachIndexed { index, source ->
-                    launch { permits.withPermit { search(source, titles)?.let { found += index to it } } }
+                    val oldAddress = manga.url.takeIf { source.id == manga.source }
+                    launch { permits.withPermit { search(source, titles, oldAddress)?.let { found += index to it } } }
                 }
             }
         }
@@ -139,8 +150,8 @@ class SourceFailover(
         return (chosen + sameLanguage).distinctBy { it.id }.take(MAX_SOURCES)
     }
 
-    /** The best-matching search result on [source], or null. */
-    private suspend fun search(source: CatalogueSource, titles: List<String>): SManga? {
+    /** The best-matching search result on [source] that isn't at [oldAddress], or null. */
+    private suspend fun search(source: CatalogueSource, titles: List<String>, oldAddress: String?): SManga? {
         for (query in titles.take(2)) {
             val results = try {
                 withTimeoutOrNull(PER_SOURCE_TIMEOUT_MS) {
@@ -153,7 +164,7 @@ class SourceFailover(
                 null
             } ?: return null // The source failed or is slow; don't press it with more queries.
             val best = results
-                .filter { TitleMatch.isSameSeries(titles, it.title) }
+                .filter { it.url != oldAddress && TitleMatch.isSameSeries(titles, it.title) }
                 .filterNot { AdultContentFilter.blocksManga(source.id, source.name, it.title, it.getGenres()) }
                 .maxByOrNull { TitleMatch.bestSimilarity(titles, it.title) }
             if (best != null) return best
@@ -162,7 +173,15 @@ class SourceFailover(
     }
 
     /** Loads [result]'s details and chapters and checks it has [wanted]; null when it doesn't. */
-    private suspend fun verify(source: CatalogueSource, result: SManga, wanted: Chapter): Replacement? {
+    /** The chapter a replacement should have: the next one to read, else the latest. */
+    suspend fun chapterToCheck(manga: Manga): Chapter? = withIOContext {
+        val numbered = getChaptersByMangaId.await(manga.id).filter { it.isRecognizedNumber }
+        val lastRead = numbered.filter { it.read }.maxOfOrNull { it.chapterNumber }
+        numbered.filter { !it.read && (lastRead == null || it.chapterNumber > lastRead) }.minByOrNull { it.chapterNumber }
+            ?: numbered.maxByOrNull { it.chapterNumber }
+    }
+
+    private suspend fun verify(source: CatalogueSource, result: SManga, wanted: Chapter?): Replacement? {
         return try {
             val local = networkToLocalManga(result.toDomainManga(source.id))
             val refreshed = withTimeoutOrNull(PER_SOURCE_TIMEOUT_MS * 2) {
@@ -172,8 +191,10 @@ class SourceFailover(
             val manga = getManga.await(local.id) ?: return null
             if (AdultContentFilter.blocksManga(manga, source.name)) return null
             val chapters = getChaptersByMangaId.await(manga.id).sortedBy { it.sourceOrder }
-            val chapter = matchingChapter(chapters, wanted) ?: return null
-            Replacement(manga, chapter, source.name)
+            if (chapters.isEmpty()) return null
+            val chapter = wanted?.let { matchingChapter(chapters, it) ?: return null }
+            val latest = chapters.filter { it.isRecognizedNumber }.maxOfOrNull { it.chapterNumber }
+            Replacement(manga, chapter, source.name, latest)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {

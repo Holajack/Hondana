@@ -27,8 +27,9 @@ SQLDelight, fork markers. This file covers only what Hondana adds.
     Kotlin same-series test), `SourceHealth` (down site vs offline phone),
     `SourceFailover` (search candidates, verify the chapter, migrate with
     Komikku's `MigrateMangaUseCase`), `ChapterLoadErrors` (reported by
-    `ReaderViewModel`). The reader side is `hondana/reader/ReaderFailover` and
-    `reader/ui/FailoverCard`.
+    `ReaderViewModel`), `TitlePageFailover` + `ui/FindElsewhere` (the title
+    page's "Find on another source"). The reader side is
+    `hondana/reader/ReaderFailover` and `reader/ui/FailoverCard`.
   - `safety/`: the always-on sexual-content filter. `AdultContentRules` (pure
     Kotlin word lists), `AdultContentFilter` (decisions, remembered blocked
     packages/source IDs), `AdultContentGuard` (startup: library cleanup,
@@ -51,7 +52,9 @@ SQLDelight, fork markers. This file covers only what Hondana adds.
   `SettingsAdvancedScreen`, `SettingsBrowseScreen`, `SourcesTab`,
   `ExtensionsTab`, `SourcePreferencesScreen`, `AnilistApi` and
   `MyAnimeListApi`. Source switching hooks into `ReaderActivity` (opening
-  error) and `ReaderViewModel` (`loadAdjacent`, `preload`).
+  error), `ReaderViewModel` (`loadAdjacent`, `preload`), the title page
+  (`ui/manga/MangaScreen` wraps its content, `MangaToolbar` menu item,
+  `MangaScreenModel` refresh error).
 
 ## Rules
 
@@ -69,6 +72,9 @@ SQLDelight, fork markers. This file covers only what Hondana adds.
    choice. Don't add one, and don't bring back Komikku's NSFW switches. It
    blocks sexual content only, not violence or gore, and only at the level of
    sources and titles: never hide or blur pages inside a chapter.
+7. Android's `java.util.regex` is ICU, which is stricter than the JVM: escape
+   every `]` and `}` in a pattern, even where the JVM accepts them bare. A bad
+   pattern in an object crashes the app the first time the object is used.
 
 ## Building
 

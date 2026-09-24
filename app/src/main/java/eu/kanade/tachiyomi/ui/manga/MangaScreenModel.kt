@@ -83,6 +83,7 @@ import exh.source.isEhBasedManga
 import exh.source.mangaDexSourceIds
 import exh.util.nullIfEmpty
 import exh.util.trimOrNull
+import hondana.failover.TitlePageFailover
 import hondana.safety.AdultContentFilter
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
@@ -637,6 +638,18 @@ class MangaScreenModel(
             }
 
             screenModelScope.launch {
+                // HONDANA -->
+                // The site is down: the message offers to find the title on another source.
+                val offered = TitlePageFailover.offerAfterRefreshError(
+                    context,
+                    snackbarHostState,
+                    state.manga.id,
+                    state.source,
+                    e,
+                    message,
+                )
+                if (offered) return@launch
+                // HONDANA <--
                 snackbarHostState.showSnackbar(message = message)
             }
             // KMK -->

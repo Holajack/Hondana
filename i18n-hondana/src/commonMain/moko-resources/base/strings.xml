@@ -150,5 +150,14 @@
     <string name="hondana_failover_next_chapter">%1$s isn\'t responding. The next chapter is on %2$s.</string>
     <string name="hondana_failover_continue_on">Continue on %1$s</string>
     <string name="hondana_failover_moved">%1$s isn\'t responding, so %2$s now reads from %3$s. Your progress came along.</string>
+    <string name="hondana_find_elsewhere">Find on another source</string>
+    <string name="hondana_find_elsewhere_found">Found on %1$s, up to chapter %2$s.</string>
+    <string name="hondana_find_elsewhere_found_unnumbered">Found on %1$s.</string>
+    <string name="hondana_find_elsewhere_move_note">Moving it there brings your read chapters, bookmarks, history, categories and trackers along.</string>
+    <string name="hondana_find_elsewhere_move">Move there</string>
+    <string name="hondana_find_elsewhere_open">Open it</string>
+    <string name="hondana_find_elsewhere_not_found">%1$s wasn\'t found on your other sources under the same name.</string>
+    <string name="hondana_find_elsewhere_moved">%1$s now reads from %2$s. Your progress came along.</string>
+    <string name="hondana_failover_new_address">%2$s moved %1$s to a new address. Hondana found it there and your progress came along.</string>
     <string name="hondana_failover_reading_from">%1$s isn\'t responding, so this chapter comes from %2$s.</string>
 </resources>

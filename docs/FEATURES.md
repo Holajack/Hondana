@@ -124,10 +124,16 @@ finds the series on your other sources and carries on.
 - **Next chapter**: if the next chapter fails to preload while you read, the
   search runs in the background and a "Continue on …" button appears at the end
   of the chapter.
-- **Which sources**: your migration sources (Browse → Migrate) first, then
-  sources you already use in your library, pinned sources, then any other source
-  in the same language, up to 20. Sources that failed in the last half hour and
-  sources the content filter blocks are skipped.
+- **On a title's page**: ⋮ → *Find on another source* runs the same search at any
+  time and shows what it found ("Found on Flame Comics, up to chapter 180")
+  before moving anything. When refreshing a title fails because its site is
+  down, the error message has the same button.
+- **Which sources**: first the title's own site, in case the series only moved
+  to a new address there (that shows as "HTTP error 404"), then your migration
+  sources (Browse → Migrate), sources you already use in your library, pinned
+  sources, then any other source in the same language, up to 20. Sources that
+  failed in the last half hour and sources the content filter blocks are
+  skipped. The menu's *Find on another source* always looks on other sources.
 - **Only a sure match**: the title must be the same after ignoring case,
   punctuation, accents, "The" and bracketed tags ("[Official]"), with no
   different numbers or words like "not" (so "Solo Leveling: Ragnarok",
@@ -142,7 +148,8 @@ one is down. To go back to the original source later, use Migrate as usual.
 
 Code: `hondana/failover/` (`TitleMatch` is plain Kotlin and was checked on pairs of
 real titles; `SourceFailover` searches and moves; `SourceHealth` tells a down
-site from an offline phone) and `hondana/reader/ReaderFailover` with its card.
+site from an offline phone; `TitlePageFailover` and `ui/FindElsewhere` are the
+title page's button) and `hondana/reader/ReaderFailover` with its card.
 
 ## Content filter: no sexual content
 

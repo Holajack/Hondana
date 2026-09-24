@@ -19,7 +19,8 @@ object TitleMatch {
 
     private val articles = setOf("the", "a", "an")
     private val combiningMarks = Regex("\\p{Mn}+")
-    private val bracketed = Regex("\\([^)]*\\)|\\[[^]]*]|\\{[^}]*}|【[^】]*】")
+    // Every bracket escaped: Android's regex engine (ICU) rejects a bare "]" or "}" that the JVM allows.
+    private val bracketed = Regex("\\([^)]*\\)|\\[[^\\]]*\\]|\\{[^}]*\\}|【[^】]*】")
     private val apostrophes = Regex("['’‘`´]")
     private val nonWord = Regex("[^\\p{L}\\p{N}]+")
 
