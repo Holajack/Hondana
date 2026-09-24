@@ -19,6 +19,7 @@ import eu.kanade.tachiyomi.data.backup.restore.restorers.PreferenceRestorer
 import eu.kanade.tachiyomi.data.backup.restore.restorers.SavedSearchRestorer
 import eu.kanade.tachiyomi.data.notification.Notifications
 import eu.kanade.tachiyomi.util.system.createFileInCacheDir
+import hondana.safety.AdultContentFilter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.ensureActive
@@ -188,6 +189,14 @@ class BackupRestorer(
         mangaRestorer.sortByNew(backupMangas)
             .forEach {
                 ensureActive()
+
+                // HONDANA -->
+                // Titles from adult-only sources or with sexual content are never written back.
+                if (AdultContentFilter.blocksManga(it.source, sourceMapping[it.source], it.title, it.genre)) {
+                    restoreProgress += 1
+                    return@forEach
+                }
+                // HONDANA <--
 
                 try {
                     mangaRestorer.restore(it, backupCategories)

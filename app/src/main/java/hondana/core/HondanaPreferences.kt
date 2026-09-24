@@ -59,6 +59,14 @@ class HondanaPreferences(private val store: PreferenceStore) {
     // Lens
 
     fun lensShowTranslations() = store.getBoolean("hondana_lens_show_translations", false)
+
+    // Content filter (see hondana.safety). Remembered from repo indexes, not user settings, so
+    // they're app state and stay out of backups.
+
+    fun blockedExtensionPackages() =
+        store.getStringSet(Preference.appStateKey("hondana_blocked_extension_packages"), emptySet())
+
+    fun blockedSourceIds() = store.getStringSet(Preference.appStateKey("hondana_blocked_source_ids"), emptySet())
 }
 
 enum class TextEngine {

@@ -777,9 +777,13 @@ object SettingsAdvancedScreen : SearchableSettings {
                     preference = exhPreferences.isHentaiEnabled(),
                     title = stringResource(SYMR.strings.toggle_hentai_features),
                     subtitle = stringResource(SYMR.strings.toggle_hentai_features_summary),
-                    onValueChanged = {
-                        true
+                    // HONDANA -->
+                    // Hondana's content filter keeps the integrated E-Hentai features off.
+                    enabled = false,
+                    onValueChanged = { enable ->
+                        !enable
                     },
+                    // HONDANA <--
                 ),
                 Preference.PreferenceItem.SwitchPreference(
                     preference = sourcePreferences.enableSourceBlacklist(),

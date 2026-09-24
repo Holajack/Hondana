@@ -36,6 +36,9 @@ data class NetworkLegacyExtension(
             versionName = version,
             lang = lang,
             isNsfw = nsfw == 1,
+            // HONDANA -->
+            hondanaAdultOnly = if (nsfw == 1) null else false,
+            // HONDANA <--
             // KMK -->
             signatureHash = store.signingKey,
             storeName = store.name,

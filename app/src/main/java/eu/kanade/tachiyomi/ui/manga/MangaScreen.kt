@@ -92,6 +92,8 @@ import exh.source.getMainSource
 import exh.source.isEhBasedSource
 import exh.ui.metadata.MetadataViewScreen
 import exh.ui.smartsearch.SmartSearchScreen
+import hondana.safety.AdultContentBlockedScreen
+import hondana.safety.AdultContentFilter
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -164,6 +166,14 @@ class MangaScreen(
         }
 
         val successState = state as MangaScreenModel.State.Success
+
+        // HONDANA -->
+        // Genres arrive with the details fetch; a title with sexual content is replaced here.
+        if (AdultContentFilter.blocksManga(successState.manga, successState.source.name)) {
+            AdultContentBlockedScreen(mangaId = successState.manga.id, onBack = { navigator.pop() })
+            return
+        }
+        // HONDANA <--
 
         // KMK -->
         val bulkFavoriteScreenModel = rememberScreenModel { BulkFavoriteScreenModel() }

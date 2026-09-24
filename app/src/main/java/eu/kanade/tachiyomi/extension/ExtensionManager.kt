@@ -21,6 +21,7 @@ import exh.source.EHENTAI_EXT_SOURCES
 import exh.source.EXHENTAI_EXT_SOURCES
 import exh.source.ExhPreferences
 import exh.source.MERGED_SOURCE_ID
+import hondana.safety.AdultContentFilter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
@@ -189,6 +190,9 @@ class ExtensionManager(
     suspend fun findAvailableExtensions() {
         val extensions: List<Extension.Available> = try {
             api.findExtensions()
+                // HONDANA -->
+                .let(AdultContentFilter::screenAvailableExtensions)
+            // HONDANA <--
         } catch (e: Exception) {
             logcat(LogPriority.ERROR, e)
             withUIContext { context.toast(MR.strings.extension_api_error) }
@@ -205,6 +209,11 @@ class ExtensionManager(
         }
         updatedInstalledExtensionsStatuses(extensions)
         setupAvailableExtensionsSourcesDataMap(extensions)
+        // HONDANA -->
+        // An installed extension the repo now rates adult-only stops loading straight away.
+        installedExtensionMapFlow.value = installedExtensionMapFlow.value
+            .filterValues { !AdultContentFilter.blocksInstalledExtension(it) }
+        // HONDANA <--
     }
 
     /**

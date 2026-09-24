@@ -18,6 +18,7 @@ import exh.util.ThrottleManager
 import exh.util.createPartialWakeLock
 import exh.util.createWifiLock
 import exh.util.ignore
+import hondana.safety.AdultContentFilter
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -206,6 +207,9 @@ class RecommendationSearchHelper(val context: Context) {
         recSource.associatedSourceId?.let { srcId ->
             return networkToLocalManga(map { it.toDomainManga(srcId) })
                 .filterNot { local -> libraryManga.any { it.id == local.id } }
+                // HONDANA -->
+                .filterNot { AdultContentFilter.blocksManga(it) }
+                // HONDANA <--
                 .map { it.toSManga() }
         }
         // KMK <--

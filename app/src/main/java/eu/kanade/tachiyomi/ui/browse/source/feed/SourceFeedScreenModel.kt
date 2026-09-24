@@ -27,6 +27,7 @@ import exh.source.getMainSource
 import exh.source.isEhBasedSource
 import exh.source.mangaDexSourceIds
 import exh.util.nullIfBlank
+import hondana.safety.AdultContentFilter
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -234,7 +235,10 @@ open class SourceFeedScreenModel(
                             .let { networkToLocalManga(it) }
                             // KMK -->
                             .filter { !hideInLibraryFeedItems || !it.favorite }
-                        // KMK <--
+                            // KMK <--
+                            // HONDANA -->
+                            .filterNot { AdultContentFilter.blocksManga(it) }
+                        // HONDANA <--
                     }
 
                     mutableState.update { state ->

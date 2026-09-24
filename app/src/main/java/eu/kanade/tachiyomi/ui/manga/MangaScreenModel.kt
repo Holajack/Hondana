@@ -83,6 +83,7 @@ import exh.source.isEhBasedManga
 import exh.source.mangaDexSourceIds
 import exh.util.nullIfEmpty
 import exh.util.trimOrNull
+import hondana.safety.AdultContentFilter
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.toImmutableList
@@ -1179,6 +1180,9 @@ class MangaScreenModel(
                             .map { it.toDomainManga(state.source.id) }
                             .distinctBy { it.url }
                             .let { networkToLocalManga(manga = it, updateInfo = false) }
+                            // HONDANA -->
+                            .filterNot { AdultContentFilter.blocksManga(it) }
+                        // HONDANA <--
                     }
 
                     updateSuccessState { successState ->

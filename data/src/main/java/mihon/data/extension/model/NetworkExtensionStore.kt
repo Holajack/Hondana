@@ -118,6 +118,13 @@ fun ExtensionList.toAvailableExtensions(store: ExtensionStore): List<TachiyomiEx
                 )
             },
             store = store,
+            // HONDANA -->
+            hondanaAdultOnly = when (extension.contentWarning) {
+                ContentWarning.NSFW -> true
+                ContentWarning.SAFE, ContentWarning.MIXED -> false
+                ContentWarning.UNSPECIFIED -> null
+            },
+            // HONDANA <--
         )
     }
 }

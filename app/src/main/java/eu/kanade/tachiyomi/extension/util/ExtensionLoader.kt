@@ -15,6 +15,8 @@ import eu.kanade.tachiyomi.source.SourceFactory
 import eu.kanade.tachiyomi.util.lang.Hash
 import eu.kanade.tachiyomi.util.storage.copyAndSetReadOnlyTo
 import eu.kanade.tachiyomi.util.system.ChildFirstPathClassLoader
+import hondana.safety.AdultContentFilter
+import hondana.safety.AdultContentRules
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
@@ -282,6 +284,20 @@ internal object ExtensionLoader {
             return LoadResult.Error
         }
 
+        // HONDANA -->
+        // Adult-only extensions never load, even when another app (e.g. Mihon) installed them.
+        val adultOnly = when {
+            appInfo.metaData.containsKey(METADATA_CONTENT_WARNING) ->
+                appInfo.metaData.getInt(METADATA_CONTENT_WARNING) >= AdultContentRules.MANIFEST_CONTENT_WARNING_ADULT_ONLY
+            appInfo.metaData.getInt(METADATA_NSFW) == 1 -> null
+            else -> false
+        }
+        if (AdultContentFilter.blocksExtension(pkgName, extName, adultOnly)) {
+            logcat(LogPriority.WARN) { "Adult-only extension $pkgName blocked" }
+            return LoadResult.Error
+        }
+        // HONDANA <--
+
         val signatures = getSignatures(pkgInfo)
         if (signatures.isNullOrEmpty()) {
             logcat(LogPriority.WARN) { "Package $pkgName isn't signed" }
@@ -342,6 +358,14 @@ internal object ExtensionLoader {
                     return LoadResult.Error
                 }
             }
+            // HONDANA -->
+            // Drop adult-only sources such as "Shadow Manga (+18)"; nothing left means blocked.
+            .filterNot { AdultContentFilter.blocksSource(it) }
+            .ifEmpty {
+                logcat(LogPriority.WARN) { "Extension $pkgName has only adult-only sources; blocked" }
+                return LoadResult.Error
+            }
+        // HONDANA <--
 
         val langs = sources.map { it.lang }.toSet()
         val lang = when (langs.size) {

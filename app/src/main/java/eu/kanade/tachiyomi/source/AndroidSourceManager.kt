@@ -24,6 +24,7 @@ import exh.source.EnhancedHttpSource
 import exh.source.ExhPreferences
 import exh.source.MERGED_SOURCE_ID
 import exh.source.handleSourceLibrary
+import hondana.safety.AdultContentFilter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -101,7 +102,7 @@ class AndroidSourceManager(
                         ),
                     ).apply {
                         // KMK -->
-                        if (isHentaiEnabled) {
+                        if (isHentaiEnabled /* HONDANA --> */ && AdultContentFilter.allowsBuiltInHentai /* HONDANA <-- */) {
                             EHENTAI_EXT_SOURCES.forEach { (id, lang) ->
                                 put(id, EHentai(id, false, context, lang))
                             }
@@ -117,10 +118,14 @@ class AndroidSourceManager(
                         // SY <--
                     }
                     extensions.forEach { extension ->
-                        extension.sources.mapNotNull { it.toInternalSource(/* KMK --> */isHentaiEnabled/* KMK <-- */) }.forEach {
-                            mutableMap[it.id] = it
-                            registerStubSource(StubSource.from(it))
-                        }
+                        extension.sources.mapNotNull { it.toInternalSource(/* KMK --> */isHentaiEnabled/* KMK <-- */) }
+                            // HONDANA -->
+                            .filterNot { AdultContentFilter.blocksSource(it) }
+                            // HONDANA <--
+                            .forEach {
+                                mutableMap[it.id] = it
+                                registerStubSource(StubSource.from(it))
+                            }
                     }
                     sourcesMapFlow.value = mutableMap
                     _isInitialized.value = true

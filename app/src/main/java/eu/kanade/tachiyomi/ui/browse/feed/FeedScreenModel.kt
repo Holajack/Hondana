@@ -13,6 +13,7 @@ import eu.kanade.presentation.browse.FeedItemUI
 import eu.kanade.tachiyomi.source.Source
 import eu.kanade.tachiyomi.source.model.FilterList
 import eu.kanade.tachiyomi.util.system.LocaleHelper
+import hondana.safety.AdultContentFilter
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -307,8 +308,11 @@ open class FeedScreenModel(
                                 .distinctBy { it.url }
                                 .let { networkToLocalManga(it) }
                                 // KMK -->
-                                .filter { !hideInLibraryFeedItems.get() || !it.favorite },
-                            // KMK <--
+                                .filter { !hideInLibraryFeedItems.get() || !it.favorite }
+                                // KMK <--
+                                // HONDANA -->
+                                .filterNot { AdultContentFilter.blocksManga(it) },
+                            // HONDANA <--
                         )
                     }
 

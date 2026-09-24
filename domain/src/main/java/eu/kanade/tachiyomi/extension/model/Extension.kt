@@ -61,6 +61,10 @@ sealed class Extension {
         val apkUrl: String,
         val iconUrl: String,
         val store: ExtensionStore,
+        // HONDANA -->
+        /** The repo's rating: true for NSFW (adult-only), false for SAFE/MIXED, null if the repo doesn't say. */
+        val hondanaAdultOnly: Boolean? = null,
+        // HONDANA <--
     ) : Extension() {
 
         data class Source(

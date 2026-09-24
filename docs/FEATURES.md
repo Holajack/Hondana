@@ -107,6 +107,44 @@ Fields: term, reading, meaning, sentence, sentence translation, source.
 
 Code: `hondana/vocab/`, stored in `hondana.db` (see below).
 
+## Content filter: no porn or hentai
+
+Always on, with no switch to turn it off. It targets sexual content only:
+violence, gore, *Mature*, *Ecchi* and general sites that are marked 18+ for
+other reasons stay available.
+
+- **Adult-only extensions never load.** Repos rate every extension SAFE, MIXED
+  or NSFW. NSFW means an adult-only site (hentai, doujin, porn, nude photos,
+  adult manhwa). Those are hidden from the extension list, can't be installed,
+  and don't load even if another app such as Mihon installed them on the phone.
+  Keiyoushi rates 381 of its 1,397 extensions NSFW.
+- **General sites stay.** MIXED sites (MangaDex, MangaFire, Weeb Central,
+  Manganato and so on) carry the "18+" badge but stay available. Their adult
+  sections are dropped: for example *Shadow Manga (+18)* and *MinoTruyen
+  Hentai* are removed while the main sources remain.
+- **Titles with sexual tags are hidden everywhere**: browsing, search, feeds,
+  recommendations and related titles. A title whose genres include *Hentai,
+  Smut, Pornographic, Erotica, Adult, Sexual Violence, Loli, Shota, Uncensored*
+  or similar, including MangaDex's *Content rating: Erotica / Pornographic*, is
+  replaced by a "Blocked" screen as soon as its details load. It won't open in
+  the reader and is deleted from the database, with its downloads.
+- **MangaDex** is kept at its own *Safe + Suggestive* content rating, so its
+  listings never include erotica or pornographic titles.
+- **Backups and your existing library**: restoring a backup skips titles from
+  adult-only sources and titles with sexual tags. Anything like that already
+  in the library is removed at startup and whenever the library changes.
+- **Also off**: TachiyomiSY's built-in E-Hentai/ExHentai features, and adult
+  results in AniList and MyAnimeList tracker searches.
+
+Repos without ratings fall back to site names (hentai, porn, 18+, and so on).
+Titles are judged by their genres and title, so a title with explicit covers
+but no sexual tags can still appear in a general site's browse list until it is
+opened. Tell the maintainer about a source or tag that slips through.
+
+Code: `hondana/safety/`. The rules (`AdultContentRules`) are plain Kotlin and
+were checked against Keiyoushi's full index: they flag none of its 579 SAFE
+extensions.
+
 ## Settings → Reading assistant
 
 - **Languages**: the language you're reading, and your own language.
@@ -127,6 +165,7 @@ Code: `hondana/vocab/`, stored in `hondana.db` (see below).
 - **Read aloud**: original or translation, speech rate, per-character voices,
   automatic page turns, sound effects on or off.
 - **Auto-scroll**: long-strip speed, and whether touching the page pauses it.
+- **Content filter**: a note on what the always-on filter blocks.
 
 Code: `hondana/settings/SettingsHondanaScreen.kt`, `hondana/core/HondanaPreferences.kt`.
 

@@ -9,6 +9,7 @@ import exh.recs.sources.RECOMMENDS_SOURCE
 import exh.recs.sources.RecommendationPagingSource
 import exh.recs.sources.RecommendationSource
 import exh.recs.sources.StaticResultPagingSource
+import hondana.safety.AdultContentFilter
 import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.mutate
 import kotlinx.collections.immutable.persistentMapOf
@@ -87,6 +88,9 @@ open class RecommendsScreenModel(
                             // If the recommendation is associated with a source, resolve it
                             page.mangas.map { it.toDomainManga(recSourceId) }
                                 .let { networkToLocalManga(it) }
+                                // HONDANA -->
+                                .filterNot { AdultContentFilter.blocksManga(it) }
+                            // HONDANA <--
                         } else {
                             // Otherwise, skip this step. The user will be prompted to choose a source via SmartSearch
                             page.mangas.map { it.toDomainManga(RECOMMENDS_SOURCE) }

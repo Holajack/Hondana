@@ -36,6 +36,7 @@ import exh.source.ExhPreferences
 import exh.source.LOCAL_SOURCE_PACKAGE
 import exh.source.getMainSource
 import exh.source.isEhBasedSource
+import hondana.safety.AdultContentFilter
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -236,6 +237,9 @@ open class BrowseSourceScreenModel(
                         .stateIn(ioCoroutineScope)
                 }
                     .filter { !hideInLibraryItems || !it.value.first.favorite }
+                    // HONDANA -->
+                    .filter { !AdultContentFilter.blocksManga(it.value.first) }
+                // HONDANA <--
             }
                 .cachedIn(ioCoroutineScope)
         }

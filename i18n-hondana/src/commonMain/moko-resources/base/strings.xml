@@ -127,4 +127,10 @@
     <string name="hondana_pref_autoscroll_info">Paged modes turn the page every few seconds; set the time with the − and + buttons while auto-scroll runs.</string>
     <string name="hondana_pref_group_words">Words</string>
     <string name="hondana_pref_open_words">Saved words</string>
+    <string name="hondana_pref_group_content_filter">Content filter</string>
+    <string name="hondana_pref_content_filter_info">Porn and hentai are always blocked. Adult-only sources never load, and titles tagged hentai, smut, pornographic, erotica or adult are hidden and removed from your library. Violence, gore and Mature titles aren\'t affected.</string>
+    <string name="hondana_blocked_title">Blocked: sexual content</string>
+    <string name="hondana_blocked_message">This title is tagged as hentai, porn or similar. Hondana doesn\'t show sexual content, so it has been removed.</string>
+    <string name="hondana_blocked_reader">This title has sexual content, so Hondana won\'t open it.</string>
+    <string name="hondana_action_go_back">Go back</string>
 </resources>

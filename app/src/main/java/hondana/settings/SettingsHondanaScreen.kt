@@ -63,6 +63,14 @@ object SettingsHondanaScreen : SearchableSettings {
                     ),
                 ),
             ),
+            Preference.PreferenceGroup(
+                title = stringResource(HMR.strings.hondana_pref_group_content_filter),
+                preferenceItems = persistentListOf(
+                    Preference.PreferenceItem.InfoPreference(
+                        title = stringResource(HMR.strings.hondana_pref_content_filter_info),
+                    ),
+                ),
+            ),
         )
     }
 

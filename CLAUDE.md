@@ -20,12 +20,22 @@ SQLDelight, fork markers. This file covers only what Hondana adds.
     `AutoScrollController`, `ReaderAssistant` (lens + read aloud),
     `ScreenCapture`, and Compose UI in `reader/ui/`.
   - `settings/`: Settings → Reading assistant.
+  - `safety/`: the always-on sexual-content filter. `AdultContentRules` (pure
+    Kotlin word lists), `AdultContentFilter` (decisions, remembered blocked
+    packages/source IDs), `AdultContentGuard` (startup: library cleanup,
+    MangaDex rating, E-Hentai off), `AdultContentBlockedScreen`.
 - `i18n-hondana/`: Hondana strings (moko-resources, class `hondana.i18n.HMR`).
   Edit only `base/strings.xml`.
 - Edits to upstream files are wrapped in `// HONDANA -->` … `// HONDANA <--`.
   Today that is `ReaderActivity`, `ReaderAppBars`, `SettingsMainScreen`,
   `app/build.gradle.kts`, `settings.gradle.kts`, `gradle/libs.versions.toml`,
   `app/proguard-rules.pro`, `.gitignore`, and the launcher/splash drawables.
+  The content filter hooks into `App`, `ExtensionLoader`, `ExtensionManager`,
+  `AndroidSourceManager`, `Extension` (domain), `NetworkExtensionStore`,
+  `NetworkLegacyExtension`, `BackupRestorer`, `MangaScreen`, `MangaScreenModel`,
+  `BrowseSourceScreenModel`, `SearchScreenModel`, `SourceFeedScreenModel`,
+  `FeedScreenModel`, `RecommendsScreenModel`, `RecommendationSearchHelper`,
+  `SettingsAdvancedScreen`, `AnilistApi` and `MyAnimeListApi`.
 
 ## Rules
 
@@ -39,6 +49,8 @@ SQLDelight, fork markers. This file covers only what Hondana adds.
    so they stay out of backups.
 5. Claude calls go through `ClaudeService` (Anthropic Java SDK). Default model
    `claude-opus-5`; the user picks others in settings.
+6. The content filter (`hondana/safety`) has no off switch, by the owner's
+   choice. Don't add one. It blocks sexual content only, not violence or gore.
 
 ## Building
 

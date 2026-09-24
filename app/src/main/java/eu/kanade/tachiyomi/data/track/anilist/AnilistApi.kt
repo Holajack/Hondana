@@ -194,12 +194,13 @@ class AnilistApi(val client: OkHttpClient, interceptor: AnilistInterceptor) {
         }
     }
 
+    // HONDANA: the search query below excludes adult titles (isAdult: false).
     suspend fun search(search: String): List<TrackSearch> {
         return withIOContext {
             val query = $$"""
             |query Search($query: String) {
                 |Page (perPage: 50) {
-                    |media(search: $query, type: MANGA, format_not_in: [NOVEL]) {
+                    |media(search: $query, type: MANGA, format_not_in: [NOVEL], isAdult: false) {
                         |id
                         |staff {
                             |edges {

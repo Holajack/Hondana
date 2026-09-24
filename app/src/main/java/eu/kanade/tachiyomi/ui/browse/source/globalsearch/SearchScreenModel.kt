@@ -9,6 +9,7 @@ import eu.kanade.domain.source.service.SourcePreferences
 import eu.kanade.presentation.util.ioCoroutineScope
 import eu.kanade.tachiyomi.extension.ExtensionManager
 import eu.kanade.tachiyomi.source.Source
+import hondana.safety.AdultContentFilter
 import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableMap
@@ -190,6 +191,9 @@ abstract class SearchScreenModel(
                             .map { it.toDomainManga(source.id) }
                             .distinctBy { it.url }
                             .let { networkToLocalManga(it) }
+                            // HONDANA -->
+                            .filterNot { AdultContentFilter.blocksManga(it) }
+                        // HONDANA <--
 
                         if (isActive) {
                             updateItem(source, SearchItemResult.Success(titles))

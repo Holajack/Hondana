@@ -76,6 +76,7 @@ import exh.log.EHLogLevel
 import exh.log.EnhancedFilePrinter
 import exh.log.XLogLogcatLogger
 import exh.log.xLogD
+import hondana.safety.AdultContentGuard
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -221,6 +222,10 @@ class App : Application(), DefaultLifecycleObserver, SingletonImageLoader.Factor
         // KMK -->
         MangaCoverMetadata.load()
         // KMK <--
+
+        // HONDANA -->
+        AdultContentGuard.start(scope)
+        // HONDANA <--
 
         // Updates widget update
         WidgetManager(Injekt.get(), Injekt.get()).apply { init(scope) }
