@@ -22,3 +22,9 @@
 *.woff binary
 *.pyc binary
 *.swp binary
+
+# HONDANA -->
+# The nudity model and the encrypted signing key must be stored byte for byte.
+*.tflite binary
+*.gpg binary
+# HONDANA <--
