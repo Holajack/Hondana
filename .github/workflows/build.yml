@@ -173,14 +173,15 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COUNT: ${{ steps.collect.outputs.count }}
           SHA: ${{ steps.collect.outputs.sha }}
-          BEFORE: ${{ github.event.before }}
         run: |
           set -euo pipefail
           TAG="r${COUNT}"
-          # What's new: the commits in this push (the app shows this text in its update screen).
+          # What's new (the app shows this text in its update screen): every commit since the last
+          # published build, so pushes whose builds were cancelled by a newer push count too.
+          PREVIOUS=$(git tag --list 'r[0-9]*' --merged HEAD --sort=-version:refname | sed -n 1p)
           CHANGES=""
-          if [ -n "$BEFORE" ] && git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
-            CHANGES=$(git log --no-merges -n 30 --format='- %s' "${BEFORE}..HEAD")
+          if [ -n "$PREVIOUS" ]; then
+            CHANGES=$(git log --no-merges -n 30 --format='- %s' "${PREVIOUS}..HEAD" | grep -v '\[skip ci\]' || true)
           fi
           [ -n "$CHANGES" ] || CHANGES=$(git log -1 --format='- %s' "$GITHUB_SHA")
           URL="https://github.com/${GITHUB_REPOSITORY}/releases/latest/download"
