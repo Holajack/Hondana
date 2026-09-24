@@ -197,4 +197,5 @@ Code: `hondana/settings/SettingsHondanaScreen.kt`, `hondana/core/HondanaPreferen
 - Named "Hondana", with its own icon: 本 ("book") in a speech bubble.
 - Stable release signing (see `signing/README.md`), so each update installs
   over the last.
-- A GitHub Actions build that publishes the APK to a stable download link.
+- A GitHub Actions build that publishes every build as a numbered release with
+  a stable download link, and an in-app updater that offers new builds.

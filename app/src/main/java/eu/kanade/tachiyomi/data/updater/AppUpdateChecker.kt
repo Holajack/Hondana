@@ -99,11 +99,8 @@ class AppUpdateChecker(
 }
 
 // HONDANA -->
-/**
- * Hondana's builds are published to a public repo of APKs only (the source repo is private,
- * and GitHub's release API can't be read anonymously there). Each build is tagged r<commit count>.
- */
-const val HONDANA_RELEASES_REPO = "Holajack/Hondana-releases"
+/** Every build on main is published here as a release tagged r<commit count>. */
+const val HONDANA_RELEASES_REPO = "Holajack/Hondana"
 private const val HONDANA_NUMBERED_RELEASES = true
 // HONDANA <--
 

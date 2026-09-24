@@ -24,10 +24,12 @@ if (Config.includeTelemetry) {
 shortcutHelper.setFilePath("./shortcuts.xml")
 
 // HONDANA -->
-// Release signing. CI secrets (HONDANA_KEYSTORE*) win when set; otherwise the
-// keystore committed under signing/ is used, so every build carries the same
-// signature and installs as an update over the previous one.
+// Release signing. CI decrypts the release key into signing/ (see signing/README.md);
+// HONDANA_KEYSTORE* environment variables also work. Every official build carries the
+// same signature, so it installs as an update over the previous one. Without a key
+// (e.g. someone building the public source) release builds use the debug key.
 val hondanaSigningProperties = rootProject.file("signing/signing.properties")
+val hondanaHasReleaseKey = !System.getenv("HONDANA_KEYSTORE").isNullOrBlank() || hondanaSigningProperties.exists()
 // HONDANA <--
 
 android {
@@ -84,7 +86,7 @@ android {
             buildConfigField("String", "BUILD_TIME", "\"${getBuildTime(useLastCommitTime = true)}\"")
 
             // HONDANA -->
-            signingConfig = signingConfigs.getByName("hondana")
+            signingConfig = signingConfigs.getByName(if (hondanaHasReleaseKey) "hondana" else "debug")
             // HONDANA <--
         }
 

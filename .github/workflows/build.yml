@@ -1,8 +1,9 @@
 name: Build Hondana APK
 
-# Builds the signed release APK and publishes it to a rolling GitHub release,
-# so the phone always downloads the newest build from one stable link:
-#   https://github.com/<owner>/<repo>/releases/download/hondana-latest/hondana.apk
+# Builds the signed release APK and publishes every build on main as a release
+# tagged r<commit count>. The phone downloads the newest one from a stable link,
+#   https://github.com/<owner>/<repo>/releases/latest/download/hondana-arm64-v8a.apk
+# and the app's updater compares that r number with its own build number.
 #
 # The APK is built here rather than in a dev container because Google's Maven
 # repository and the Android SDK (dl.google.com) are often blocked there.
@@ -62,32 +63,59 @@ jobs:
           kotlin.compiler.execution.strategy=in-process
           EOF
 
-      # Optional: if these repository secrets exist they replace the keystore
-      # committed under signing/. See signing/README.md before adding them —
-      # a different key means one uninstall/reinstall on the phone.
-      - name: Use signing key from secrets (optional)
+      # The release key is in the repo only as signing/hondana-release.tar.gpg,
+      # encrypted (AES-256) with the SIGNING_PASSPHRASE secret. The first build
+      # without that file creates a new key and commits the encrypted bundle, so
+      # the key never exists anywhere in readable form. See signing/README.md.
+      # Pull requests get no secrets; their builds fall back to the debug key.
+      - name: Unlock the signing key
+        if: github.event_name != 'pull_request'
         env:
-          KEYSTORE_B64: ${{ secrets.HONDANA_KEYSTORE_BASE64 }}
-          KEYSTORE_PASSWORD: ${{ secrets.HONDANA_KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.HONDANA_KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.HONDANA_KEY_PASSWORD }}
+          SIGNING_PASSPHRASE: ${{ secrets.SIGNING_PASSPHRASE }}
         run: |
-          if [ -n "$KEYSTORE_B64" ]; then
-            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/hondana.jks"
-            {
-              echo "HONDANA_KEYSTORE=$RUNNER_TEMP/hondana.jks"
-              echo "HONDANA_KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD"
-              echo "HONDANA_KEY_ALIAS=$KEY_ALIAS"
-              echo "HONDANA_KEY_PASSWORD=$KEY_PASSWORD"
-            } >> "$GITHUB_ENV"
-            echo "Signing with the key from repository secrets."
-          else
-            echo "Signing with the committed key in signing/."
+          set -euo pipefail
+          if [ -z "$SIGNING_PASSPHRASE" ]; then
+            echo "::error::The SIGNING_PASSPHRASE secret is missing, so this build can't be signed. Add it under Settings > Secrets and variables > Actions."
+            exit 1
           fi
+          bundle=signing/hondana-release.tar.gpg
+          # Another build may have created the key since this one checked out.
+          git fetch --quiet origin main
+          if [ ! -f "$bundle" ] && git cat-file -e "origin/main:$bundle" 2>/dev/null; then
+            git show "origin/main:$bundle" > "$bundle"
+          fi
+          if [ -f "$bundle" ]; then
+            gpg --batch --quiet --pinentry-mode loopback --passphrase-file <(printf '%s' "$SIGNING_PASSPHRASE") \
+              --decrypt "$bundle" | tar -x -C signing
+            echo "::add-mask::$(sed -n 's/^storePassword=//p' signing/signing.properties)"
+            echo "Signing with the key in $bundle."
+          else
+            echo "No release key yet: creating one."
+            password=$(openssl rand -hex 32)
+            echo "::add-mask::$password"
+            keytool -genkeypair -keystore signing/hondana-release.jks -storetype PKCS12 \
+              -alias hondana -keyalg RSA -keysize 4096 -validity 36500 \
+              -dname "CN=Hondana, O=Holajack" -storepass "$password" -keypass "$password" -noprompt
+            printf 'storeFile=hondana-release.jks\nstorePassword=%s\nkeyAlias=hondana\nkeyPassword=%s\n' \
+              "$password" "$password" > signing/signing.properties
+            tar -C signing -cf - hondana-release.jks signing.properties |
+              gpg --batch --quiet --pinentry-mode loopback --passphrase-file <(printf '%s' "$SIGNING_PASSPHRASE") \
+                --symmetric --cipher-algo AES256 --s2k-mode 3 --s2k-digest-algo SHA512 --s2k-count 65011712 \
+                --output "$bundle"
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add "$bundle"
+            git commit --quiet -m "Signing: new release key, stored encrypted"
+            # A rejected push (main moved on) fails the build rather than signing with an unsaved key.
+            git push --quiet origin HEAD:main
+            echo "Created and committed a new release key."
+          fi
+          keytool -list -v -keystore signing/hondana-release.jks \
+            -storepass "$(sed -n 's/^storePassword=//p' signing/signing.properties)" | grep -m1 'SHA256:'
 
       - name: Build release APK
         # --continue: report every independent failure (compile, packaging, R8) in one run.
-        # -Penable-updater: the app checks Hondana-releases for new builds (see below).
+        # -Penable-updater: the app checks this repo's releases for new builds.
         run: ./gradlew assembleRelease --stacktrace --continue -Penable-updater
 
       - name: Collect APKs
@@ -118,81 +146,58 @@ jobs:
           path: app/build/outputs/mapping/release
           retention-days: 30
 
-      # A release asset is a plain link a phone browser can download, unlike a
-      # zipped workflow artifact. The release is recreated on every build so the
-      # tag always points at the commit the APK came from.
-      - name: Publish to the rolling release
+      # Never publish an APK signed with anything but the release key.
+      - name: Check the APK signature
+        if: github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          apksigner=$(ls -d "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -n 1)
+          "$apksigner" verify --print-certs out/hondana-arm64-v8a.apk | tee "$RUNNER_TEMP/signer.txt"
+          if grep -q "CN=Android Debug" "$RUNNER_TEMP/signer.txt"; then
+            echo "::error::The APK is signed with the debug key, not the release key."
+            exit 1
+          fi
+
+      # A release asset is a plain link a phone browser can download without a
+      # GitHub sign-in, and the in-app updater reads these releases (r<number>).
+      - name: Publish the release
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COUNT: ${{ steps.collect.outputs.count }}
           SHA: ${{ steps.collect.outputs.sha }}
-        run: |
-          set -e
-          URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/hondana-latest"
-          NOTES=$(cat <<EOF
-          **[Download hondana-arm64-v8a.apk](${URL}/hondana-arm64-v8a.apk)**: for almost every phone from 2017 on.
-
-          Other builds: [hondana.apk](${URL}/hondana.apk) (universal: every phone, but much larger), [armeabi-v7a](${URL}/hondana-armeabi-v7a.apk) (older 32-bit phones).
-
-          Open a link on your Android phone and tap the file to install. Android asks you to allow installs from this browser the first time. Every build is signed with the same key, so new builds install over the old one and keep your library.
-
-          Build r${COUNT} from \`${SHA}\`. This release is replaced by every push to main.
-          EOF
-          )
-          gh release delete hondana-latest --cleanup-tag --yes >/dev/null 2>&1 || true
-          gh release create hondana-latest out/hondana.apk out/hondana-arm64-v8a.apk out/hondana-armeabi-v7a.apk \
-            --target "$GITHUB_SHA" \
-            --title "Hondana r${COUNT} (latest build)" \
-            --notes "$NOTES" \
-            --latest
-          echo "APK: ${URL}/hondana.apk"
-
-      # The in-app updater reads GitHub's release API, which can't see this private
-      # repo without a login. So every build is also published to a public repo that
-      # holds APKs only, tagged r<commit count> (the app compares that number with its
-      # own). Needs a RELEASES_TOKEN secret: a fine-grained token with "Contents: Read
-      # and write" on Holajack/Hondana-releases. Without it this step is skipped.
-      - name: Publish to Hondana-releases (in-app updates)
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-        env:
-          GH_TOKEN: ${{ secrets.RELEASES_TOKEN }}
-          RELEASES_REPO: Holajack/Hondana-releases
-          COUNT: ${{ steps.collect.outputs.count }}
-          SHA: ${{ steps.collect.outputs.sha }}
           BEFORE: ${{ github.event.before }}
         run: |
-          set -e
-          if [ -z "$GH_TOKEN" ]; then
-            echo "::warning::RELEASES_TOKEN is not set, so r${COUNT} was not published to ${RELEASES_REPO} and the in-app updater won't offer it."
-            exit 0
-          fi
+          set -euo pipefail
           TAG="r${COUNT}"
           # What's new: the commits in this push (the app shows this text in its update screen).
+          CHANGES=""
           if [ -n "$BEFORE" ] && git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
-            CHANGES=$(git log --no-merges -n 30 --format='- %s' "${BEFORE}..${GITHUB_SHA}")
+            CHANGES=$(git log --no-merges -n 30 --format='- %s' "${BEFORE}..HEAD")
           fi
           [ -n "$CHANGES" ] || CHANGES=$(git log -1 --format='- %s' "$GITHUB_SHA")
-          URL="https://github.com/${RELEASES_REPO}/releases/latest/download"
+          URL="https://github.com/${GITHUB_REPOSITORY}/releases/latest/download"
           NOTES=$(cat <<EOF
           ${CHANGES}
 
-          **Install:** [hondana-arm64-v8a.apk](${URL}/hondana-arm64-v8a.apk) for almost every phone from 2017 on, or [hondana.apk](${URL}/hondana.apk) (universal, larger). Hondana updates itself after that: it checks this page and offers new builds.
+          **Install:** [hondana-arm64-v8a.apk](${URL}/hondana-arm64-v8a.apk) for almost every phone from 2017 on, or [hondana.apk](${URL}/hondana.apk) (universal, larger). After that Hondana offers new builds itself.
 
           Build ${TAG} from \`${SHA}\`.
           EOF
           )
-          if gh release view "$TAG" --repo "$RELEASES_REPO" >/dev/null 2>&1; then
-            gh release upload "$TAG" out/hondana.apk out/hondana-arm64-v8a.apk out/hondana-armeabi-v7a.apk \
-              --repo "$RELEASES_REPO" --clobber
+          # The old rolling "hondana-latest" release has no build number; the updater only reads r<number> tags.
+          gh release delete hondana-latest --cleanup-tag --yes >/dev/null 2>&1 || true
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" out/hondana.apk out/hondana-arm64-v8a.apk out/hondana-armeabi-v7a.apk --clobber
           else
             gh release create "$TAG" out/hondana.apk out/hondana-arm64-v8a.apk out/hondana-armeabi-v7a.apk \
-              --repo "$RELEASES_REPO" \
+              --target "$(git rev-parse HEAD)" \
               --title "Hondana ${TAG}" \
               --notes "$NOTES" \
               --latest
           fi
           # Keep the ten newest builds.
-          gh release list --repo "$RELEASES_REPO" --limit 100 --json tagName --jq '.[10:][].tagName' |
-            while read -r old; do gh release delete "$old" --repo "$RELEASES_REPO" --cleanup-tag --yes; done
-          echo "Published https://github.com/${RELEASES_REPO}/releases/tag/${TAG}"
+          gh release list --limit 100 --json tagName \
+            --jq '[.[] | select(.tagName | test("^r[0-9]+$"))][10:][].tagName' |
+            while read -r old; do gh release delete "$old" --cleanup-tag --yes; done
+          echo "Published https://github.com/${GITHUB_REPOSITORY}/releases/tag/${TAG}"

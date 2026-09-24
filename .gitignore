@@ -20,6 +20,7 @@ local.properties
 /app/client_secrets.json
 /app/google-services.json
 *.jks
-# HONDANA: the app's release key is committed on purpose (private repo), see signing/README.md
-!signing/hondana-release.jks
+# HONDANA: the release key is committed only encrypted (signing/hondana-release.tar.gpg);
+# CI decrypts it into these files, which must never be committed. See signing/README.md.
+signing/signing.properties
 app/standard/preview/*

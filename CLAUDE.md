@@ -58,18 +58,21 @@ SQLDelight, fork markers. This file covers only what Hondana adds.
 ## Building
 
 GitHub Actions (`.github/workflows/build.yml`) builds `assembleRelease` on every
-push to `main` (with `-Penable-updater`). It uploads the APKs as a workflow
-artifact, refreshes the private `hondana-latest` release, and publishes the
-build to the public **Holajack/Hondana-releases** repo as release
-`r<commit count>` (needs the `RELEASES_TOKEN` secret; skipped with a warning
-otherwise). The in-app updater (`AppUpdateChecker`, `HONDANA_RELEASES_REPO`)
-reads that public repo and compares its `r` number with `BuildConfig.COMMIT_COUNT`. A clean build takes about 30–40
-minutes on the free 2-core runner, less with a warm Gradle cache.
+push to `main` (with `-Penable-updater`), checks the APK is signed with the
+release key, and publishes it as a release tagged `r<commit count>` in this
+(public) repo, keeping the ten newest. The in-app updater (`AppUpdateChecker`,
+`HONDANA_RELEASES_REPO`) compares that `r` number with `BuildConfig.COMMIT_COUNT`.
+
+The release key is committed only as `signing/hondana-release.tar.gpg`
+(AES-256, passphrase in the `SIGNING_PASSPHRASE` secret); CI decrypts it before
+building. Never commit `signing/*.jks` or `signing/signing.properties`. The key
+committed before September 2026 was exposed when the repo went public and is
+retired.
 
 Locally (needs JDK 21 and Android SDK 36):
 
 ```bash
-./gradlew assembleRelease          # signed with signing/hondana-release.jks
+./gradlew assembleRelease          # debug-signed unless signing/ holds the decrypted key
 ./gradlew spotlessApply            # formatting (ktlint), optional
 ```
 

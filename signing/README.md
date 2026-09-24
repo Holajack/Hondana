@@ -1,26 +1,45 @@
-# Signing key
+# Release signing
 
-`hondana-release.jks` signs every release build (alias `hondana`; the
-passwords are in `signing.properties`). Android only installs an update over an
-existing app when both are signed with the same key, so this file is what lets
-each new APK replace the last one without losing your library.
+Android installs an update only when it is signed with the same key as the app
+already on the phone. Official Hondana builds are all signed with one release
+key, so every build installs over the last and keeps the library.
 
-It is committed because this repository is **private**. Anyone who can read the
-repo can sign APKs that your phone would accept as updates to Hondana.
+## Where the key lives
 
-**Before making the repository public**, move the key into Actions secrets and
-delete the files here:
+- `hondana-release.tar.gpg` holds the keystore (`hondana-release.jks`, alias
+  `hondana`) and its passwords (`signing.properties`), encrypted with AES-256.
+  It is safe to keep in a public repo as long as the passphrase stays secret.
+- The passphrase is the repository secret **`SIGNING_PASSPHRASE`** (Settings →
+  Secrets and variables → Actions). It exists nowhere else.
+- CI decrypts the bundle into this folder before building
+  (`.github/workflows/build.yml`, step "Unlock the signing key"). The decrypted
+  files are git-ignored and must never be committed.
+- The build refuses to publish an APK signed with anything else.
 
-1. Add these repository secrets (Settings → Secrets and variables → Actions):
-   - `HONDANA_KEYSTORE_BASE64`: output of `base64 -w0 signing/hondana-release.jks`
-   - `HONDANA_KEYSTORE_PASSWORD`, `HONDANA_KEY_PASSWORD`: from `signing.properties`
-   - `HONDANA_KEY_ALIAS`: `hondana`
-2. `git rm signing/hondana-release.jks signing/signing.properties`. The key
-   stays in git history, so treat it as exposed if the old history is ever
-   published. Rewrite history, or generate a new key and reinstall once.
+The first build that finds no bundle here creates a new key, encrypts it and
+commits it (`Signing: new release key, stored encrypted`). That happened once,
+in September 2026.
 
-The workflow prefers the secrets whenever `HONDANA_KEYSTORE_BASE64` is set.
+## The old key is retired
 
-Keep a copy of the keystore somewhere safe outside GitHub too. If it is lost,
-the next build can't update the installed app: back up your library (More →
-Backup and restore), uninstall, install the new build, and restore.
+Until September 2026 the keystore and its password were committed in plain text
+while the repo was private. They were exposed when the repo went public, so
+that key was replaced. Don't trust any APK signed with the old certificate
+(SHA-256 `C7:5B:CA:…:71:F9`). Installs made with it had to be uninstalled once.
+
+## Building a signed APK yourself
+
+```bash
+gpg --decrypt signing/hondana-release.tar.gpg | tar -x -C signing   # asks for the passphrase
+./gradlew assembleRelease
+rm signing/hondana-release.jks signing/signing.properties
+```
+
+Without the key, `assembleRelease` signs with the debug key: fine for testing,
+but it won't install over an official build.
+
+## If the passphrase is lost or leaks
+
+The key can't be recovered without the passphrase. Delete
+`hondana-release.tar.gpg`, set a new `SIGNING_PASSPHRASE`, and push: CI creates
+a new key. Every phone then needs one uninstall and reinstall (back up first).

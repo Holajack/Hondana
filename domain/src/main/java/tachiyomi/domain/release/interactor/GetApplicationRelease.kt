@@ -85,7 +85,10 @@ class GetApplicationRelease(
         return if (isPreview) {
             // Preview builds: based on releases in "komikku-app/komikku-preview" repo
             // tagged as something like "r1234"
-            newVersion.toInt() > commitCount
+            // HONDANA -->
+            // A release without a build number in its tag is never an update (and mustn't crash).
+            (newVersion.toIntOrNull() ?: return false) > commitCount
+            // HONDANA <--
         } else {
             // Release builds: based on releases in "komikku-app/komikku" repo
             // tagged as something like "v0.1.2"

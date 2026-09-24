@@ -12,9 +12,9 @@ Komikku's own feature list is in [docs/KOMIKKU_README.md](docs/KOMIKKU_README.md
 
 ## Install
 
-**[Download hondana-arm64-v8a.apk](https://github.com/Holajack/Hondana-releases/releases/latest/download/hondana-arm64-v8a.apk)**
+**[Download hondana-arm64-v8a.apk](https://github.com/Holajack/Hondana/releases/latest/download/hondana-arm64-v8a.apk)**
 (almost every phone from 2017 on). If it won't install, use the universal
-[hondana.apk](https://github.com/Holajack/Hondana-releases/releases/latest/download/hondana.apk),
+[hondana.apk](https://github.com/Holajack/Hondana/releases/latest/download/hondana.apk),
 which is larger.
 
 These links are public (no GitHub sign-in needed), so they work for friends
@@ -30,7 +30,7 @@ use Firefox.
 
 ### Updates
 
-Hondana checks [Hondana-releases](https://github.com/Holajack/Hondana-releases/releases)
+Hondana checks this repo's [releases](https://github.com/Holajack/Hondana/releases)
 for new builds, like Mihon does: when one is out it shows what's new with a
 **Download** button, and a notification when the app is closed. Check now under
 **More → About → Check for updates**. On Android 12+ it downloads updates in the
@@ -38,7 +38,7 @@ background on Wi-Fi and, once Hondana installed the previous update itself,
 installs them without asking.
 
 Every push to `main` builds a new version (tagged `r<build number>`); the ten
-newest stay on the releases page. The source stays in this private repo.
+newest stay on the releases page.
 
 ### Bring your existing setup over
 
@@ -86,14 +86,15 @@ explanations, and for other scripts. Details, costs and privacy notes are in
 
 ## Building
 
-GitHub Actions builds every push (`.github/workflows/build.yml`), publishes the
-APK to the `hondana-latest` release, and keeps it as a workflow artifact for 30
-days.
+GitHub Actions builds every push (`.github/workflows/build.yml`), publishes it
+as a release tagged `r<build number>`, and keeps the APKs as a workflow artifact
+for 30 days. Official builds are signed with a key that is stored in this repo
+only in encrypted form; see [signing/README.md](signing/README.md).
 
 To build locally you need JDK 21 and the Android SDK (platform 36):
 
 ```bash
-./gradlew assembleRelease      # signed APKs in app/build/outputs/apk/release/
+./gradlew assembleRelease      # APKs in app/build/outputs/apk/release/ (debug-signed without the key)
 ./gradlew assembleDebug        # side-by-side dev build, package suffix .dev
 ```
 
