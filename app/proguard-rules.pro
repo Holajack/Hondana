@@ -339,4 +339,9 @@
 # Jackson reads @ConstructorProperties/@Transient only when java.beans has them (not on Android).
 -dontwarn java.beans.ConstructorProperties
 -dontwarn java.beans.Transient
+
+# LiteRT (TensorFlow Lite): the native library looks up and calls its Java classes by name, and
+# the GPU delegate classes it can refer to aren't included.
+-keep class org.tensorflow.lite.** { *; }
+-dontwarn org.tensorflow.lite.**
 # HONDANA <--

@@ -57,6 +57,7 @@ import exh.source.getMainSource
 import exh.source.isEhBasedManga
 import exh.util.defaultReaderType
 import exh.util.mangaType
+import hondana.safety.NudityScreen
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -1195,6 +1196,9 @@ class ReaderViewModel @JvmOverloads constructor(
         }
         // SY <--
         if (page?.status != Page.State.Ready) return
+        // HONDANA -->
+        if (NudityScreen.refuseHidden(Injekt.get<Application>(), page)) return
+        // HONDANA <--
         val manga = manga ?: return
 
         val context = Injekt.get<Application>()
@@ -1240,6 +1244,9 @@ class ReaderViewModel @JvmOverloads constructor(
 
         if (firstPage.status != Page.State.Ready) return
         if (secondPage?.status != Page.State.Ready) return
+        // HONDANA -->
+        if (NudityScreen.refuseHidden(Injekt.get<Application>(), firstPage, secondPage)) return
+        // HONDANA <--
 
         val manga = manga ?: return
 
@@ -1321,6 +1328,9 @@ class ReaderViewModel @JvmOverloads constructor(
         }
         // SY <--
         if (page?.status != Page.State.Ready) return
+        // HONDANA -->
+        if (NudityScreen.refuseHidden(Injekt.get<Application>(), page)) return
+        // HONDANA <--
         val manga = manga ?: return
 
         val context = Injekt.get<Application>()
@@ -1354,6 +1364,9 @@ class ReaderViewModel @JvmOverloads constructor(
 
         if (firstPage.status != Page.State.Ready) return
         if (secondPage?.status != Page.State.Ready) return
+        // HONDANA -->
+        if (NudityScreen.refuseHidden(Injekt.get<Application>(), firstPage, secondPage)) return
+        // HONDANA <--
         val manga = manga ?: return
 
         val context = Injekt.get<Application>()
@@ -1390,6 +1403,9 @@ class ReaderViewModel @JvmOverloads constructor(
         }
         // SY <--
         if (page?.status != Page.State.Ready) return
+        // HONDANA -->
+        if (NudityScreen.refuseHidden(Injekt.get<Application>(), page)) return
+        // HONDANA <--
         val manga = manga ?: return
         val stream = page.stream ?: return
 

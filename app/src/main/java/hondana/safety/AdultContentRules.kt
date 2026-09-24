@@ -7,8 +7,9 @@ import java.util.Locale
  * Word lists and matching for Hondana's sexual-content filter. Pure Kotlin with no Android types,
  * so it can be tested on the JVM against real repo indexes. [AdultContentFilter] applies it.
  *
- * Only pornography and hentai are targeted. Violence, gore, "Mature", "Ecchi", "Seinen" and
- * similar labels are left alone, and so are general sites that merely host some adult titles.
+ * Sexual content is targeted: porn, hentai, and ecchi or fan-service titles, which are built
+ * around nudity. Violence, gore, "Mature", "Seinen" and similar labels are left alone, and so
+ * are general sites that merely host some adult titles.
  */
 object AdultContentRules {
 
@@ -36,16 +37,20 @@ object AdultContentRules {
         "sexual violence", "sexual content", "sex", "nudity", "nude", "uncensored",
         "lolicon", "loli", "shotacon", "shota", "futanari", "nsfw", "xxx",
         "18", "18+", "+18", "r18", "r 18", "r-18", "18 plus", "pornhwa", "hentai manhwa",
+        "fan service", "fanservice", "echi", "nudez", "desnudos",
     )
 
     // Genre stems matched anywhere in a genre label ("Content rating: Pornographic", "Эротика").
     private val genreStems = listOf(
         "hentai", "porn", "erotic", "erotik", "smut", "lolicon", "shotacon", "sexual violence",
-        "sexual content", "uncensored", "nsfw", "эрот", "порн", "хентай",
+        "sexual content", "uncensored", "nsfw", "ecchi", "эрот", "порн", "хентай", "этти", "эччи",
     )
 
     // CJK and Korean markers, matched in the raw text (names, genres and titles).
     private val cjkMarkers = listOf("成人", "色情", "18禁", "エロ", "工口", "绅士", "紳士", "禁漫", "성인", "19금", "야동")
+
+    // Extra markers for genre labels only: "ecchi" and Chinese "fan service".
+    private val genreCjkMarkers = listOf("エッチ", "卖肉", "賣肉")
 
     // Title markers. "エロ" alone is left out of titles on purpose (Eromanga Sensei).
     private val titleWords = setOf("hentai", "uncensored", "porn", "porno", "nsfw", "xxx", "r18", "pornhwa")
@@ -63,7 +68,7 @@ object AdultContentRules {
         return sourceStems.any { it in squashed }
     }
 
-    /** True when a title's genres or title say it is porn or hentai. */
+    /** True when a title's genres or title say it is sexual content. */
     fun isSexualTitle(title: String?, genres: Collection<String>?): Boolean {
         genres?.forEach { if (isSexualGenre(it)) return true }
         if (title.isNullOrBlank()) return false
@@ -76,7 +81,7 @@ object AdultContentRules {
     fun isSexualGenre(genre: String): Boolean {
         val raw = genre.lowercase(Locale.ROOT).trim()
         if (raw.isEmpty()) return false
-        if (cjkMarkers.any { it in raw }) return true
+        if (cjkMarkers.any { it in raw } || genreCjkMarkers.any { it in raw }) return true
         val plain = stripAccents(raw)
         if (plain in genreExact) return true
         val spaced = words(plain).joinToString(" ")

@@ -3,6 +3,7 @@ package hondana.safety
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import eu.kanade.domain.source.service.SourcePreferences
 import eu.kanade.tachiyomi.data.download.DownloadManager
 import exh.source.ExhPreferences
 import exh.source.MANGADEX_IDS
@@ -28,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  * Background side of [AdultContentFilter], started from `App.onCreate`:
  * - keeps TachiyomiSY's integrated E-Hentai features switched off (a restored backup can't
- *   turn them back on);
+ *   turn them back on), and upstream's extension NSFW preference on (its switch is removed);
  * - keeps MangaDex's own content-rating filter at Safe + Suggestive, so its listings never
  *   include Erotica or Pornographic titles;
  * - deletes blocked titles from the database, with their downloads: at startup, and whenever
@@ -55,6 +56,16 @@ object AdultContentGuard {
         val hentaiFeatures = Injekt.get<ExhPreferences>().isHentaiEnabled()
         hentaiFeatures.changes()
             .onEach { if (it) hentaiFeatures.set(false) }
+            .launchIn(appScope)
+
+        // Upstream's "NSFW content" switch is gone. Left off (say, by a restored backup) it would
+        // hide every extension rated as hosting any adult titles, general sites like MangaDex
+        // included; adult-only sites are blocked by AdultContentFilter either way. Set before the
+        // extension loader first reads it.
+        val showRatedExtensions = Injekt.get<SourcePreferences>().showNsfwSource()
+        if (!showRatedExtensions.get()) showRatedExtensions.set(true)
+        showRatedExtensions.changes()
+            .onEach { if (!it) showRatedExtensions.set(true) }
             .launchIn(appScope)
 
         appScope.launch(Dispatchers.IO) {

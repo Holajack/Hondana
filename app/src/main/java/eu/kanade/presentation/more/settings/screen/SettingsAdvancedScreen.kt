@@ -773,18 +773,8 @@ object SettingsAdvancedScreen : SearchableSettings {
         return Preference.PreferenceGroup(
             title = stringResource(SYMR.strings.developer_tools),
             preferenceItems = persistentListOf(
-                Preference.PreferenceItem.SwitchPreference(
-                    preference = exhPreferences.isHentaiEnabled(),
-                    title = stringResource(SYMR.strings.toggle_hentai_features),
-                    subtitle = stringResource(SYMR.strings.toggle_hentai_features_summary),
-                    // HONDANA -->
-                    // Hondana's content filter keeps the integrated E-Hentai features off.
-                    enabled = false,
-                    onValueChanged = { enable ->
-                        !enable
-                    },
-                    // HONDANA <--
-                ),
+                // HONDANA: no switch for the integrated E-Hentai features; AdultContentGuard keeps
+                // them off.
                 Preference.PreferenceItem.SwitchPreference(
                     preference = sourcePreferences.enableSourceBlacklist(),
                     title = stringResource(SYMR.strings.enable_source_blacklist),

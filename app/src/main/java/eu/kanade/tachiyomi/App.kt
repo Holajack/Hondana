@@ -78,6 +78,7 @@ import exh.log.XLogLogcatLogger
 import exh.log.xLogD
 import hondana.extensions.ExtensionSetup
 import hondana.safety.AdultContentGuard
+import hondana.safety.NudityImageInterceptor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -280,6 +281,10 @@ class App : Application(), DefaultLifecycleObserver, SingletonImageLoader.Factor
                 add(PagePreviewKeyer())
                 add(PagePreviewFetcher.Factory(callFactoryLazy))
                 // SY <--
+                // HONDANA -->
+                // Covers and other pictures that show nudity are replaced by a "hidden" card.
+                add(NudityImageInterceptor(this@App))
+                // HONDANA <--
             }
 
             diskCache(

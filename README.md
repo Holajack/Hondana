@@ -73,10 +73,11 @@ Everything from Komikku, plus a row of reading tools in the reader menu:
   for each character, then on to the next page. Read the original for listening
   practice, or the translation as an audio drama.
 - **Saved words** with New / Learning / Known status, AnkiDroid and TSV export.
-- **No porn or hentai**, always: adult-only extensions never load, general
-  sites stay but lose their adult sections, and titles tagged as sexual content
-  are hidden and removed. Violence and gore aren't filtered. See
-  [Content filter](docs/FEATURES.md#content-filter-no-porn-or-hentai).
+- **No sexual content**, always, with no NSFW switch: adult-only extensions
+  never load, general sites stay but lose their adult sections, titles tagged
+  as sexual content (ecchi included) are hidden and removed, and every page and
+  cover is checked for nudity on the phone before it's shown. Violence and gore
+  aren't filtered. See [Content filter](docs/FEATURES.md#content-filter-no-sexual-content).
 
 Text recognition and translation work offline on the phone (Google ML Kit:
 Latin, Japanese, Chinese and Korean scripts). Add a Claude API key under

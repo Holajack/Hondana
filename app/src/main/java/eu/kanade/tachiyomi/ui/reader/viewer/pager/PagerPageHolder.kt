@@ -15,6 +15,7 @@ import eu.kanade.tachiyomi.ui.reader.viewer.ReaderPageImageView
 import eu.kanade.tachiyomi.ui.reader.viewer.ReaderProgressIndicator
 import eu.kanade.tachiyomi.ui.webview.WebViewActivity
 import eu.kanade.tachiyomi.widget.ViewPagerAdapter
+import hondana.safety.NudityScreen
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
@@ -196,13 +197,17 @@ class PagerPageHolder(
                             mergePages(Buffer().readFrom(source), source2?.let { Buffer().readFrom(it) })
                         }
                         // SY <--
-                        val isAnimated = ImageUtil.isAnimatedAndSupported(itemSource)
+                        // HONDANA -->
+                        // A page that shows nudity is replaced by a "hidden" card before it's shown.
+                        val shownSource = NudityScreen.screenPage(context, itemSource, item.first, item.second)
+                        // HONDANA <--
+                        val isAnimated = ImageUtil.isAnimatedAndSupported(shownSource)
                         val background = if (!isAnimated && viewer.config.automaticBackground) {
-                            ImageUtil.chooseBackground(context, itemSource.peek())
+                            ImageUtil.chooseBackground(context, shownSource.peek())
                         } else {
                             null
                         }
-                        Triple(itemSource, isAnimated, background)
+                        Triple(shownSource, isAnimated, background)
                     }
                 }
             }
